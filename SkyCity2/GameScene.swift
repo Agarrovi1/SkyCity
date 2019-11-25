@@ -30,6 +30,27 @@ class GameScene: SKScene {
     
     
     //MARK: - Methods
+    private func handleEditButtonPressed(_ location: CGPoint) {
+           // Check if the location of the touch is within the button's bounds
+           if editButton.contains(location) {
+               switch editMode {
+               case .edit:
+                   print("done editing")
+                   editMode = .notEdit
+                   buildButton.isHidden = true
+               case .notEdit:
+                   print("editing mode")
+                   editMode = .edit
+                   buildButton.isHidden = false
+               }
+            landNode.editMode = editMode
+           }
+       }
+    private func handleBuildButtonPressed(_ location: CGPoint) {
+        if buildButton.contains(location) {
+            landNode.placeNewItem()
+        }
+    }
     
     
     //MARK: - SetUp
@@ -91,6 +112,14 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         setupGameUI(view: view)
         
+    }
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for touch: AnyObject in touches {
+            // Get the location of the touch in this scene
+            let location = touch.location(in: self)
+            handleEditButtonPressed(location)
+            handleBuildButtonPressed(location)
+        }
     }
     
     override func update(_ currentTime: TimeInterval) {

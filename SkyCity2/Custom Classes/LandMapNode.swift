@@ -10,8 +10,17 @@ import SpriteKit
 
 class LandMapNode: SKTileMapNode {
     var plots = [PlotNode]()
-    private var preLayoutNode = PlotNode()
-    var editMode: EditMode = .notEdit
+    private var preLayoutNode = PlotNode(state: .layout)
+    var editMode: EditMode = .notEdit {
+        didSet {
+            switch editMode {
+            case .notEdit:
+                preLayoutNode.removeFromParent()
+            case .edit:
+                setPreLayoutNode()
+            }
+        }
+    }
     
     
     override init() {
@@ -32,36 +41,23 @@ class LandMapNode: SKTileMapNode {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {return}
-        preLayoutNode.run(SKAction.move(to: touch.location(in: self), duration: 0))
+        preLayoutNode.position = touch.location(in: self)
+        changeOutlineColor()
+        
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        print("touch land ended")
-        print(position)
+        
+        
     }
     
-    func touchMoved(toPoint pos : CGPoint) {
-        preLayoutNode.run(SKAction.move(to: pos, duration: 0))
-        if let n = self.preLayoutNode.copy() as? SKShapeNode {
-            n.position = pos
-            n.strokeColor = SKColor.blue
-            self.addChild(n)
-        }
-    }
-    func touchUp(atPoint pos : CGPoint) {
-        preLayoutNode.run(SKAction.move(to: pos, duration: 0))
-        if let n = self.preLayoutNode.copy() as? SKShapeNode {
-            n.position = pos
-            n.strokeColor = SKColor.red
-            self.addChild(n)
-        }
-    }
     
-    private func placeNewItem() {
-            if let newNode = self.preLayoutNode.copy() as? PlotNode {
+    
+    func placeNewItem() {
+            if let newNode = self.preLayoutNode.copy() as? PlotNode, !checkIfIntersectingFrames() {
                 newNode.zPosition = 1
                 newNode.position = preLayoutNode.position
-                newNode.fillColor = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
+                newNode.color = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
                 plots.append(newNode)
                 self.addChild(newNode)
                 print(newNode.frame)
@@ -80,16 +76,14 @@ class LandMapNode: SKTileMapNode {
         }
         private func changeOutlineColor() {
             if checkIfIntersectingFrames() {
-                preLayoutNode.strokeColor = .red
+                preLayoutNode.color = #colorLiteral(red: 1, green: 0.1491314173, blue: 0, alpha: 0.5490956764)
             } else {
-                preLayoutNode.strokeColor = .blue
+                preLayoutNode.color = #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 0.5543931935)
             }
         }
     func setPreLayoutNode() {
-        self.preLayoutNode = PlotNode()
-        preLayoutNode.strokeColor = .blue
+        preLayoutNode.color = #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 0.5543931935)
         preLayoutNode.zPosition = 2
-        preLayoutNode.lineWidth = 2.5
         addChild(preLayoutNode)
     }
     
