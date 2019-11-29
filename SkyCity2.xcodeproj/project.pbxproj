@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D2229CD238C70E90039722D /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D2229CC238C70E90039722D /* FileManager.swift */; };
 		4D4F1DFE238C262500F91CC9 /* MyTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4D4F1DFD238C262500F91CC9 /* MyTileSet.sks */; };
 		4D4F1E00238C295E00F91CC9 /* LandMapNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */; };
 		4D4FFF3E238C38920083AEBE /* EditMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4FFF3D238C38920083AEBE /* EditMode.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D2229CC238C70E90039722D /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 		4D4F1DFD238C262500F91CC9 /* MyTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyTileSet.sks; sourceTree = "<group>"; };
 		4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandMapNode.swift; sourceTree = "<group>"; };
 		4D4FFF3D238C38920083AEBE /* EditMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMode.swift; sourceTree = "<group>"; };
@@ -70,6 +72,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D2229CB238C70CD0039722D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				4D4FFF3D238C38920083AEBE /* EditMode.swift */,
+				4D2229CC238C70E90039722D /* FileManager.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		4D4F1E01238C29B200F91CC9 /* Custom Classes */ = {
 			isa = PBXGroup;
 			children = (
@@ -104,7 +115,7 @@
 				4DCC62E72381B8BF009B2DA2 /* AppDelegate.swift */,
 				4DCC62E92381B8BF009B2DA2 /* GameScene.sks */,
 				4DCC62EB2381B8BF009B2DA2 /* Actions.sks */,
-				4D4FFF3D238C38920083AEBE /* EditMode.swift */,
+				4D2229CB238C70CD0039722D /* Models */,
 				4DCC62ED2381B8BF009B2DA2 /* GameScene.swift */,
 				4D4F1E01238C29B200F91CC9 /* Custom Classes */,
 				4DCC62EF2381B8BF009B2DA2 /* GameViewController.swift */,
@@ -232,6 +243,7 @@
 				4D4FFF3E238C38920083AEBE /* EditMode.swift in Sources */,
 				4DCC62EE2381B8BF009B2DA2 /* GameScene.swift in Sources */,
 				4DCC62F02381B8BF009B2DA2 /* GameViewController.swift in Sources */,
+				4D2229CD238C70E90039722D /* FileManager.swift in Sources */,
 				4D4F1E00238C295E00F91CC9 /* LandMapNode.swift in Sources */,
 				4DCC630E2381B92A009B2DA2 /* PlotNode.swift in Sources */,
 				4DCC62E82381B8BF009B2DA2 /* AppDelegate.swift in Sources */,

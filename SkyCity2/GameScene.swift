@@ -53,6 +53,7 @@ class GameScene: SKScene {
     }
     
     
+    
     //MARK: - SetUp
     func setCloudBgTexture() {
         let bgTexture = SKTexture(imageNamed: "clouds")
