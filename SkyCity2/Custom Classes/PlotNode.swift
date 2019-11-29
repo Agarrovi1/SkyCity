@@ -23,6 +23,7 @@ class PlotNode: SKSpriteNode {
     var state: State = .layout {
         didSet {
             if self.state == .seeds {
+                color = #colorLiteral(red: 0.5738074183, green: 0.5655357838, blue: 0, alpha: 1)
                 print("planted seeds")
             }
         }
@@ -56,7 +57,7 @@ class PlotNode: SKSpriteNode {
     }
     //MARK: Touch Override
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else {return}
-        print("plot touched")
+        guard touches.first != nil else {return}
+        state = .seeds
     }
 }

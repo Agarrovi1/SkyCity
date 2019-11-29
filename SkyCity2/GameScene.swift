@@ -26,6 +26,7 @@ class GameScene: SKScene {
     var foodLabel = SKLabelNode()
     var starBitsLabel = SKLabelNode()
     var buildButton = SKNode()
+    var plantButton = SKNode()
     
     
     
@@ -38,11 +39,15 @@ class GameScene: SKScene {
                    print("done editing")
                    editMode = .notEdit
                    buildButton.isHidden = true
+                   plantButton.isHidden = false
                case .notEdit:
                    print("editing mode")
                    editMode = .edit
                    buildButton.isHidden = false
-               }
+                   plantButton.isHidden = true
+               case .plant:
+                return
+            }
             landNode.editMode = editMode
            }
        }
@@ -51,7 +56,14 @@ class GameScene: SKScene {
             landNode.placeNewItem()
         }
     }
-    
+    private func handlePlantButtonPressed(_ location: CGPoint) {
+        if plantButton.contains(location) && landNode.editMode == .notEdit {
+            landNode.editMode = .plant
+        } else if plantButton.contains(location) && landNode.editMode == .plant {
+            landNode.editMode = .notEdit
+            print("go back to not edit mode")
+        }
+    }
     
     
     //MARK: - SetUp
@@ -71,6 +83,11 @@ class GameScene: SKScene {
         editButton = SKSpriteNode(color: SKColor.red, size: CGSize(width: 100, height: 44))
         editButton.position = CGPoint(x:self.frame.maxX - 70, y:self.frame.maxY - 70)
         self.addChild(editButton)
+    }
+    func makePlantButton() {
+        plantButton = SKSpriteNode(color: SKColor.green, size: CGSize(width: 100, height: 44))
+        plantButton.position = CGPoint(x:self.frame.minX + 70, y:self.frame.minY + 70)
+        self.addChild(plantButton)
     }
     func makeFoodLabel() {
         foodLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
@@ -106,6 +123,7 @@ class GameScene: SKScene {
         makeFoodLabel()
         makeStarBitsLabel()
         makeBuildButton()
+        makePlantButton()
         
     }
     
@@ -120,6 +138,7 @@ class GameScene: SKScene {
             let location = touch.location(in: self)
             handleEditButtonPressed(location)
             handleBuildButtonPressed(location)
+            handlePlantButtonPressed(location)
         }
     }
     

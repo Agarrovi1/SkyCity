@@ -17,9 +17,14 @@ class LandMapNode: SKTileMapNode {
             case .notEdit:
                 preLayoutNode.removeFromParent()
                 makePlotsInteractable()
+                goToNotEditMode()
             case .edit:
                 setPreLayoutNode()
                 makePlotsNotInteractable()
+            case .plant:
+                goToPlantMode()
+                print("plant")
+                
             }
         }
     }
@@ -103,6 +108,16 @@ class LandMapNode: SKTileMapNode {
     private func makePlotsNotInteractable() {
         for plot in plots {
             plot.isUserInteractionEnabled = false
+        }
+    }
+    private func goToPlantMode() {
+        for plot in plots {
+            plot.mode = .plant
+        }
+    }
+    private func goToNotEditMode() {
+        for plot in plots {
+            plot.mode = .notEdit
         }
     }
     
