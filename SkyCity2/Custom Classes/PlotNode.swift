@@ -18,14 +18,23 @@ class PlotNode: SKSpriteNode {
     }
     
     var plantTime: CFAbsoluteTime?
+    var maxTime: Int = 0
+    var maxAmount = 10
     var mode: EditMode = .notEdit
     
     var state: State = .layout {
         didSet {
-            if self.state == .seeds {
+            switch state {
+            case .seeds:
                 color = #colorLiteral(red: 0.5738074183, green: 0.5655357838, blue: 0, alpha: 1)
+                plantTime = CFAbsoluteTimeGetCurrent()
                 print("planted seeds")
+            case .harvest:
+                color = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
+            default:
+                return
             }
+            
         }
     }
     
@@ -58,6 +67,43 @@ class PlotNode: SKSpriteNode {
     //MARK: Touch Override
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard touches.first != nil else {return}
-        state = .seeds
+        switch mode {
+        case .plant:
+            state = .seeds
+        default:
+            return
+        }
     }
+    
+    
+    //MARK: Functions
+    func harvestUpdate() {
+        guard let plantTime = plantTime else {return}
+        let currentTimeAbsolute = CFAbsoluteTimeGetCurrent()
+        
+        let timePassed = currentTimeAbsolute - plantTime
+        switch state {
+        case .seeds:
+            maxTime = min(Int(Float(timePassed) / 1), maxAmount)
+            if maxTime == maxAmount {
+                state = .harvest
+            }
+        default:
+            break
+        }
+    }
+
+    
+    //MARK: TODO: refactor this to make an updating label?
+    /*
+     func updateStockingTimerText() {
+       let stockingTimeTotal = CFTimeInterval(Float(maxAmount) * stockingSpeed)
+       let currentTime = CFAbsoluteTimeGetCurrent()
+       let timePassed = currentTime - lastStateSwitchTime
+       let stockingTimeLeft = stockingTimeTotal - timePassed
+       stockingTimer.text = String(format: "%.0f", stockingTimeLeft)
+     }
+
+     */
+    
 }

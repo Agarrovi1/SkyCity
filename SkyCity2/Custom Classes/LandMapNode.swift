@@ -120,5 +120,10 @@ class LandMapNode: SKTileMapNode {
             plot.mode = .notEdit
         }
     }
+    func updateEachPlot() {
+        for plot in plots {
+            plot.harvestUpdate()
+        }
+    }
     
 }
