@@ -8,6 +8,7 @@
 
 import SpriteKit
 import UIKit
+import UserNotifications
 
 class PlotNode: SKSpriteNode {
     enum State {
@@ -17,10 +18,12 @@ class PlotNode: SKSpriteNode {
         case layout
     }
     
+    //MARK: - Properties
     var plantTime: CFAbsoluteTime?
     var maxTime: Int = 0
     var maxAmount = 10
     var mode: EditMode = .notEdit
+    var delegate: NotificationDelegate?
     
     var state: State = .layout {
         didSet {
@@ -28,6 +31,7 @@ class PlotNode: SKSpriteNode {
             case .seeds:
                 color = #colorLiteral(red: 0.5738074183, green: 0.5655357838, blue: 0, alpha: 1)
                 plantTime = CFAbsoluteTimeGetCurrent()
+                delegate?.makeNotification(title: "SkyCity", message: "Your harvest is ready", timeInterval: Double(maxAmount))
                 print("planted seeds")
             case .harvest:
                 color = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
@@ -49,6 +53,7 @@ class PlotNode: SKSpriteNode {
 //        lineWidth = 4
 //    }
     
+    //MARK: - Init
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {
         super.init(texture: texture, color: color, size: size)
     }
@@ -64,7 +69,7 @@ class PlotNode: SKSpriteNode {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    //MARK: Touch Override
+    //MARK: - Touch Override
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard touches.first != nil else {return}
         switch mode {
@@ -76,7 +81,7 @@ class PlotNode: SKSpriteNode {
     }
     
     
-    //MARK: Functions
+    //MARK: - Functions
     func harvestUpdate() {
         guard let plantTime = plantTime else {return}
         let currentTimeAbsolute = CFAbsoluteTimeGetCurrent()
