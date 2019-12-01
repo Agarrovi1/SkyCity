@@ -10,6 +10,7 @@ import SpriteKit
 
 class LandMapNode: SKTileMapNode {
     var delegate: NotificationDelegate?
+    var gameSceneDelegate: LabelDelegate?
     var plots = [PlotNode]()
     private var preLayoutNode = PlotNode(state: .layout)
     var editMode: EditMode = .notEdit {
@@ -67,6 +68,7 @@ class LandMapNode: SKTileMapNode {
                 newNode.zPosition = 1
                 newNode.state = .empty
                 newNode.delegate = delegate
+                newNode.gameSceneDelegate = gameSceneDelegate
                 newNode.position = preLayoutNode.position
                 newNode.color = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
                 plots.append(newNode)

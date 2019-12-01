@@ -10,3 +10,7 @@ import Foundation
 protocol NotificationDelegate {
     func makeNotification(title: String, message: String,timeInterval: Double)
 }
+
+protocol LabelDelegate {
+    func updateFoodLabel(amount: Int)
+}

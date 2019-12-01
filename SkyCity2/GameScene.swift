@@ -17,6 +17,7 @@ class GameScene: SKScene {
 //    spinnyNode.position = view.center
     //MARK: -Properties
     var editMode: EditMode = .notEdit
+    var foodAmount: Int = 0
     
     
     //MARK: - Objects
@@ -118,6 +119,7 @@ class GameScene: SKScene {
     func setupGameUI(view: SKView) {
         setCloudBgTexture()
         addChild(landNode)
+        landNode.gameSceneDelegate = self
         landNode.position = view.center
         makeEditButton()
         makeFoodLabel()
@@ -146,5 +148,14 @@ class GameScene: SKScene {
         // Called before each frame is rendered
         landNode.updateEachPlot()
     }
+    
+}
+
+extension GameScene: LabelDelegate {
+    func updateFoodLabel(amount: Int) {
+        foodAmount += amount
+        foodLabel.text = "Food: \(foodAmount)"
+    }
+    
     
 }
