@@ -76,6 +76,8 @@ class LandMapNode: SKTileMapNode {
             }
         }
     }
+    
+    //MARK: Private Functions
     private func checkIfIntersectingFrames() -> Bool {
         for node in plots {
             if !preLayoutNode.intersects(node) {

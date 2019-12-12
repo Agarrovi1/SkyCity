@@ -96,10 +96,14 @@ class PlotNode: SKSpriteNode {
             break
         }
     }
+    
+    //MARK: - Private Functions
     private func handleSwitchOnMode() {
         switch mode {
         case .plant:
+            if state == .empty {
             state = .seeds
+            }
         case .notEdit:
             if state == .harvest {
                 gameSceneDelegate?.updateFoodLabel(amount: foodValue)
