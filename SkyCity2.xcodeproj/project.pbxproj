@@ -12,6 +12,8 @@
 		4D4F1DFE238C262500F91CC9 /* MyTileSet.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4D4F1DFD238C262500F91CC9 /* MyTileSet.sks */; };
 		4D4F1E00238C295E00F91CC9 /* LandMapNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */; };
 		4D4FFF3E238C38920083AEBE /* EditMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4FFF3D238C38920083AEBE /* EditMode.swift */; };
+		4D909AB423A2D4D200BBB154 /* BuildingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D909AB323A2D4D200BBB154 /* BuildingNode.swift */; };
+		4D909AB623A2D66A00BBB154 /* CGLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D909AB523A2D66A00BBB154 /* CGLayer.swift */; };
 		4DCC62E82381B8BF009B2DA2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCC62E72381B8BF009B2DA2 /* AppDelegate.swift */; };
 		4DCC62EA2381B8BF009B2DA2 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC62E92381B8BF009B2DA2 /* GameScene.sks */; };
 		4DCC62EC2381B8BF009B2DA2 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC62EB2381B8BF009B2DA2 /* Actions.sks */; };
@@ -40,6 +42,8 @@
 		4D4F1DFD238C262500F91CC9 /* MyTileSet.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = MyTileSet.sks; sourceTree = "<group>"; };
 		4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandMapNode.swift; sourceTree = "<group>"; };
 		4D4FFF3D238C38920083AEBE /* EditMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditMode.swift; sourceTree = "<group>"; };
+		4D909AB323A2D4D200BBB154 /* BuildingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingNode.swift; sourceTree = "<group>"; };
+		4D909AB523A2D66A00BBB154 /* CGLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGLayer.swift; sourceTree = "<group>"; };
 		4DCC62E42381B8BF009B2DA2 /* SkyCity2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkyCity2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DCC62E72381B8BF009B2DA2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4DCC62E92381B8BF009B2DA2 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -88,7 +92,9 @@
 			isa = PBXGroup;
 			children = (
 				4DCC630D2381B92A009B2DA2 /* PlotNode.swift */,
+				4D909AB323A2D4D200BBB154 /* BuildingNode.swift */,
 				4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */,
+				4D909AB523A2D66A00BBB154 /* CGLayer.swift */,
 			);
 			path = "Custom Classes";
 			sourceTree = "<group>";
@@ -246,7 +252,9 @@
 				4D4FFF3E238C38920083AEBE /* EditMode.swift in Sources */,
 				4DCC62EE2381B8BF009B2DA2 /* GameScene.swift in Sources */,
 				4DCC62F02381B8BF009B2DA2 /* GameViewController.swift in Sources */,
+				4D909AB423A2D4D200BBB154 /* BuildingNode.swift in Sources */,
 				4D2229CD238C70E90039722D /* FileManager.swift in Sources */,
+				4D909AB623A2D66A00BBB154 /* CGLayer.swift in Sources */,
 				4D4F1E00238C295E00F91CC9 /* LandMapNode.swift in Sources */,
 				4DCC630E2381B92A009B2DA2 /* PlotNode.swift in Sources */,
 				4DCC62E82381B8BF009B2DA2 /* AppDelegate.swift in Sources */,

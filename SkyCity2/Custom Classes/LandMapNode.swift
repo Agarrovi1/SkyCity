@@ -9,6 +9,7 @@
 import SpriteKit
 
 class LandMapNode: SKTileMapNode {
+    //MARK: - Properties
     var delegate: NotificationDelegate?
     var gameSceneDelegate: LabelDelegate?
     var plots = [PlotNode]()
@@ -76,6 +77,11 @@ class LandMapNode: SKTileMapNode {
             }
         }
     }
+    func updateEachPlot() {
+        for plot in plots {
+            plot.harvestUpdate()
+        }
+    }
     
     //MARK: Private Functions
     private func checkIfIntersectingFrames() -> Bool {
@@ -126,11 +132,7 @@ class LandMapNode: SKTileMapNode {
             plot.mode = .notEdit
         }
     }
-    func updateEachPlot() {
-        for plot in plots {
-            plot.harvestUpdate()
-        }
-    }
+    
     
     
 }
