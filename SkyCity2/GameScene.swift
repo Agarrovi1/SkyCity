@@ -8,6 +8,13 @@
 
 import SpriteKit
 import GameplayKit
+import Foundation
+
+enum NotificationNames: String {
+    case modeChanged
+    case foodIncreased
+    case updatePlots
+}
 
 class GameScene: SKScene {
     
@@ -16,13 +23,26 @@ class GameScene: SKScene {
 //    addChild(spinnyNode)
 //    spinnyNode.position = view.center
     //MARK: -Properties
-    var editMode: EditMode = .notEdit
+    var mode: Mode = .growing {
+        didSet {
+               switch mode {
+               case .plotting:
+                   buildButton.isHidden = false
+                   plantButton.isHidden = true
+               case .growing:
+                   buildButton.isHidden = true
+                   plantButton.isHidden = false
+               case .planting:
+                print("planting")
+            }
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": mode])
+        }
+    }
     var foodAmount: Int = 0
-    
+
     
     //MARK: - Objects
     var landNode = LandMapNode()
-    
     var editButton = SKNode()
     var foodLabel = SKLabelNode()
     var starBitsLabel = SKLabelNode()
@@ -32,37 +52,30 @@ class GameScene: SKScene {
     
     
     //MARK: - Methods
-    private func handleEditButtonPressed(_ location: CGPoint) {
-           // Check if the location of the touch is within the button's bounds
-           if editButton.contains(location) {
-               switch editMode {
-               case .edit:
-                   print("done editing")
-                   editMode = .notEdit
-                   buildButton.isHidden = true
-                   plantButton.isHidden = false
-               case .notEdit:
-                   print("editing mode")
-                   editMode = .edit
-                   buildButton.isHidden = false
-                   plantButton.isHidden = true
-               case .plant:
-                return
-            }
-            landNode.editMode = editMode
-           }
-       }
-    private func handleBuildButtonPressed(_ location: CGPoint) {
-        if buildButton.contains(location) {
-            landNode.placeNewItem()
+    private func handleEditButtonPressed() {
+        switch mode {
+        case .plotting:
+            print("done editing")
+            mode = .growing
+        case .growing:
+            print("editing mode")
+            mode = .plotting
+        default:
+            return
         }
     }
-    private func handlePlantButtonPressed(_ location: CGPoint) {
-        if plantButton.contains(location) && landNode.editMode == .notEdit {
-            landNode.editMode = .plant
-        } else if plantButton.contains(location) && landNode.editMode == .plant {
-            landNode.editMode = .notEdit
-            print("go back to not edit mode")
+    
+    private func handleBuildButtonPressed() {
+        landNode.placeNewItem()
+    }
+    private func handlePlantButtonPressed() {
+        switch mode {
+        case .planting:
+            mode = .growing
+        case .growing:
+            mode = .planting
+        default:
+            return
         }
     }
     
@@ -119,7 +132,6 @@ class GameScene: SKScene {
     func setupGameUI(view: SKView) {
         setCloudBgTexture()
         addChild(landNode)
-        landNode.gameSceneDelegate = self
         landNode.position = view.center
         makeEditButton()
         makeFoodLabel()
@@ -129,33 +141,39 @@ class GameScene: SKScene {
         
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     //MARK: - Override Methods
     override func didMove(to view: SKView) {
         setupGameUI(view: view)
-        
+         NotificationCenter.default.addObserver(self, selector: #selector(handle), name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: nil)
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch: AnyObject in touches {
             // Get the location of the touch in this scene
             let location = touch.location(in: self)
-            handleEditButtonPressed(location)
-            handleBuildButtonPressed(location)
-            handlePlantButtonPressed(location)
+            if editButton.contains(location) {
+                handleEditButtonPressed()
+            } else if buildButton.contains(location) {
+                handleBuildButtonPressed()
+            } else if plantButton.contains(location) {
+                handlePlantButtonPressed()
+            }
         }
     }
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
-        landNode.updateEachPlot()
+        guard landNode.plots.count > 0 else {return}
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationNames.updatePlots.rawValue), object: self)
     }
-    
-}
-
-extension GameScene: LabelDelegate {
-    func updateFoodLabel(amount: Int) {
+    @objc private func handle(notification: Notification) {
+        guard let amount = notification.userInfo?["foodAmount"] as? Int else {
+            return
+        }
         foodAmount += amount
         foodLabel.text = "Food: \(foodAmount)"
     }
-    
-    
 }

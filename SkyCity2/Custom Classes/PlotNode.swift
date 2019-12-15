@@ -9,6 +9,7 @@
 import SpriteKit
 import UIKit
 import UserNotifications
+import Foundation
 
 class PlotNode: SKSpriteNode {
     enum State {
@@ -20,12 +21,16 @@ class PlotNode: SKSpriteNode {
     
     //MARK: - Properties
     var plantTime: CFAbsoluteTime?
-    var maxTime: Int = 0
+    var maxTime: Int = 0 
     var maxTimeAmount = 10
     var foodValue: Int = 100
-    var mode: EditMode = .notEdit
+    var mode: Mode = .growing {
+        didSet {
+            print("changed")
+        }
+    }
     var delegate: NotificationDelegate?
-    var gameSceneDelegate: LabelDelegate?
+    var timer: Timer?
     
     var state: State = .layout {
         didSet {
@@ -34,28 +39,21 @@ class PlotNode: SKSpriteNode {
                 color = #colorLiteral(red: 0.5738074183, green: 0.5655357838, blue: 0, alpha: 1)
                 plantTime = CFAbsoluteTimeGetCurrent()
                 delegate?.makeNotification(title: "SkyCity", message: "Your harvest is ready", timeInterval: Double(maxTimeAmount))
+                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] (_) in
+                    self?.handleHarvestUpdates()
+                })
                 print("planted seeds")
             case .harvest:
                 color = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
             case .empty:
                 color = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
+                plantTime = nil
             default:
                 return
             }
             
         }
     }
-    
-    
-//    override init() {
-//        super.init()
-//    }
-//    convenience init(state: State) {
-//        self.init(rect: CGRect(origin: .zero, size: CGSize(width: 60, height: 60)), cornerRadius: 10)
-//        self.state = state
-//        strokeColor = .blue
-//        lineWidth = 4
-//    }
     
     //MARK: - Init
     override init(texture: SKTexture?, color: UIColor, size: CGSize) {
@@ -67,22 +65,37 @@ class PlotNode: SKSpriteNode {
         self.state = state
         isUserInteractionEnabled = true
         
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     //MARK: - Touch Override
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard touches.first != nil else {return}
-        handleSwitchOnMode()
+        handlePlotPressed()
     }
     
     
-    //MARK: - Functions
-    func harvestUpdate() {
-        guard let plantTime = plantTime else {return}
+    //MARK: - Private Functions
+    private func handlePlotPressed() {
+        if state == .empty {
+            state = .seeds
+        } else if state == .harvest {
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: self, userInfo: ["foodAmount": foodValue])
+            state = .empty
+        }
+    }
+
+    private func handleHarvestUpdates() {
+        guard let plantTime = plantTime else {
+            return
+        }
         let currentTimeAbsolute = CFAbsoluteTimeGetCurrent()
         
         let timePassed = currentTimeAbsolute - plantTime
@@ -91,32 +104,15 @@ class PlotNode: SKSpriteNode {
             maxTime = min(Int(Float(timePassed) / 1), maxTimeAmount)
             if maxTime == maxTimeAmount {
                 state = .harvest
+                timer?.invalidate()
             }
         default:
             break
         }
     }
-    
-    //MARK: - Private Functions
-    private func handleSwitchOnMode() {
-        switch mode {
-        case .plant:
-            if state == .empty {
-            state = .seeds
-            }
-        case .notEdit:
-            if state == .harvest {
-                gameSceneDelegate?.updateFoodLabel(amount: foodValue)
-                state = .empty
-            }
-        default:
-            return
-        }
-    }
-    
 
     
-    //MARK: TODO: refactor this to make an updating label?
+    //MARK: TODO: refactor this to make an updating label? 
     /*
      func updateStockingTimerText() {
        let stockingTimeTotal = CFTimeInterval(Float(maxAmount) * stockingSpeed)
@@ -127,5 +123,5 @@ class PlotNode: SKSpriteNode {
      }
 
      */
-    
+
 }

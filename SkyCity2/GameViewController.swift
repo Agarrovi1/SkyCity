@@ -15,6 +15,8 @@ class GameViewController: UIViewController {
     
     private var unNotificationCenter: UNUserNotificationCenter!
     
+    //MARK: TODO: make login/SignIn here?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let scene = GameScene(size: view.frame.size)

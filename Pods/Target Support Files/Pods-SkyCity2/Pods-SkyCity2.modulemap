@@ -1,0 +1,6 @@
+framework module Pods_SkyCity2 {
+  umbrella header "Pods-SkyCity2-umbrella.h"
+
+  export *
+  module * { export * }
+}
