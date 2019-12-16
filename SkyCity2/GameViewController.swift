@@ -10,6 +10,7 @@ import UIKit
 import SpriteKit
 import GameplayKit
 import UserNotifications
+import FirebaseAuth
 
 class GameViewController: UIViewController {
     
@@ -23,13 +24,14 @@ class GameViewController: UIViewController {
         view.image = UIImage(named: "loginBackground")
         return view
     }()
-    var emailTextField: UITextField = {
+    lazy var emailTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Enter Email"
         textField.font = UIFont(name: "Verdana", size: 14)
         textField.backgroundColor = .white
         textField.borderStyle = .roundedRect
         textField.autocorrectionType = .no
+        textField.addTarget(self, action: #selector(pressReturnOnEmailTextField), for: .primaryActionTriggered)
         return textField
     }()
     lazy var passwordTextField: UITextField = {
@@ -40,7 +42,7 @@ class GameViewController: UIViewController {
         textField.borderStyle = .roundedRect
         textField.autocorrectionType = .no
         textField.isSecureTextEntry = true
-        //textField.addTarget(self, action: #selector(tryLogIn), for: .primaryActionTriggered)
+        textField.addTarget(self, action: #selector(attemptLogin), for: .primaryActionTriggered)
         return textField
     }()
     lazy var loginButton: UIButton = {
@@ -48,9 +50,11 @@ class GameViewController: UIViewController {
         button.setTitle("Login", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = UIFont(name: "Verdana-Bold", size: 14)
-        button.backgroundColor = #colorLiteral(red: 0.9686274529, green: 0.78039217, blue: 0.3450980484, alpha: 1)
+        button.backgroundColor = #colorLiteral(red: 0.2800978124, green: 0.2492664158, blue: 0.5517837405, alpha: 1)
         button.layer.cornerRadius = 5
-        //button.addTarget(self, action: #selector(tryLogIn), for: .touchUpInside)
+        button.layer.borderColor = UIColor.white.cgColor
+        button.layer.borderWidth = 2
+        button.addTarget(self, action: #selector(attemptLogin), for: .touchUpInside)
         return button
     }()
     var createAccountButton: UIButton = {
@@ -65,7 +69,7 @@ class GameViewController: UIViewController {
         button.setAttributedTitle(attributedTitle, for: .normal)
         button.backgroundColor = .white
         button.layer.cornerRadius = 10
-               // button.addTarget(self, action: #selector(displayForm), for: .touchUpInside)
+        button.addTarget(self, action: #selector(displayForm), for: .touchUpInside)
         return button
     }()
     var logoLabel: UILabel = {
@@ -83,11 +87,9 @@ class GameViewController: UIViewController {
     var signInEmail: UITextField?
     var signInPassword: UITextField?
     
-    //MARK: TODO: make login/SignIn here?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = #colorLiteral(red: 0.2800978124, green: 0.2492664158, blue: 0.5517837405, alpha: 1)
         askForNotificationPermission()
         setupLogInUI()
         
@@ -113,7 +115,107 @@ class GameViewController: UIViewController {
         skView.showsFPS = true
         skView.presentScene(scene)
         scene.landNode.delegate = self
+        hideSubViews()
     }
+    
+    
+    private func makeAlert(with title: String, and message: String) {
+        let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        present(alertVC, animated: true, completion: nil)
+    }
+    private func hideSubViews() {
+        logInBackground.isHidden = true
+        emailTextField.isHidden = true
+        passwordTextField.isHidden = true
+        createAccountButton.isHidden = true
+        logoLabel.isHidden = true
+        loginButton.isHidden = true
+    }
+    @objc private func pressReturnOnEmailTextField() {
+        emailTextField.resignFirstResponder()
+        passwordTextField.becomeFirstResponder()
+    }
+    //MARK: Handling Login
+    private func handleLoginResponse(result: (Result<(),Error>)) {
+        switch result {
+        case .success:
+            setupGameScene()
+        case .failure(let error):
+            makeAlert(with: "Error, could not log in", and: "\(error)")
+        }
+    }
+    
+    @objc private func attemptLogin() {
+        guard let email = emailTextField.text, !email.isEmpty, let password = passwordTextField.text, !password.isEmpty else {return}
+        FirebaseAuthService.manager.loginUser(email: email.lowercased(), password: password) { (result) in
+            self.handleLoginResponse(result: result)
+        }
+    }
+    //MARK: Handling SignIn
+    private func handleCreateAccountResponse(with result: Result<User, Error>) {
+        DispatchQueue.main.async { [weak self] in
+            switch result {
+            case .success(let user):
+                FirestoreService.manager.createAppUser(user: AppUser(from: user)) { [weak self] newResult in
+                    self?.handleCreatedUserInFirestore(result: newResult)
+                }
+            case .failure(let error):
+                self?.makeAlert(with: "Error creating user", and: "An error occured while creating new account \(error)")
+            }
+        }
+    }
+    private func handleCreatedUserInFirestore(result: Result<(), Error>) {
+        switch result {
+        case .success:
+            setupGameScene()
+           
+        case .failure(let error):
+            self.makeAlert(with: "Error creating user", and: "An error occured while creating new account \(error)")
+        }
+    }
+    
+    @objc func displayForm(){
+        let alert = UIAlertController(title: "Sign In", message: "Create an account", preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "Cancel" , style: .cancel)
+        
+        let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) -> Void in
+            
+            guard let email = self.signInEmail?.text, !email.isEmpty, let password = self.signInPassword?.text, !password.isEmpty else {
+                self.makeAlert(with: "Required", and: "Fill both fields")
+                return
+            }
+            FirebaseAuthService.manager.createNewUser(email: email.lowercased(), password: password) { (result) in
+                switch result {
+                case .failure(let error):
+                    self.makeAlert(with: "Couldn't create user", and: "Error: \(error)")
+                case .success(let newUser):
+                    FirestoreService.manager.createAppUser(user: AppUser.init(from: newUser)) { (result) in
+                        self.handleLoginResponse(result: result)
+                    }
+                    
+                }
+            }
+        }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(saveAction)
+        
+        alert.addTextField(configurationHandler: {(textField: UITextField!) in
+            textField.placeholder = "Enter email address"
+            self.signInEmail = textField
+        })
+        
+        alert.addTextField(configurationHandler: {(textField: UITextField!) in
+            textField.placeholder = "Enter password"
+            textField.isSecureTextEntry = true
+            self.signInPassword = textField
+        })
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     
     //MARK: - Constraints
     func setupLogInUI() {
@@ -122,6 +224,7 @@ class GameViewController: UIViewController {
         setPasswordTextFieldConstraints()
         setSignInButtonConstraints()
         setLogoLabelConstraints()
+        setLoginButtonConstraints()
     }
     func setBackroundImageConstraints() {
         view.addSubview(logInBackground)
@@ -133,15 +236,15 @@ class GameViewController: UIViewController {
             logInBackground.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)])
     }
     func setEmailTextFieldConstraints() {
-        logInBackground.addSubview(emailTextField)
+        view.addSubview(emailTextField)
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            emailTextField.bottomAnchor.constraint(equalTo: logInBackground.centerYAnchor, constant: -150),
-            emailTextField.leadingAnchor.constraint(equalTo: logInBackground.leadingAnchor, constant: 20),
-            emailTextField.trailingAnchor.constraint(equalTo: logInBackground.trailingAnchor, constant: -20)])
+            emailTextField.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -150),
+            emailTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            emailTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)])
     }
     func setPasswordTextFieldConstraints() {
-        logInBackground.addSubview(passwordTextField)
+        view.addSubview(passwordTextField)
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             passwordTextField.topAnchor.constraint(equalTo: emailTextField.bottomAnchor,constant: 50),
@@ -149,18 +252,25 @@ class GameViewController: UIViewController {
             passwordTextField.trailingAnchor.constraint(equalTo: emailTextField.trailingAnchor)])
     }
     func setSignInButtonConstraints() {
-        logInBackground.addSubview(createAccountButton)
+        view.addSubview(createAccountButton)
         createAccountButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            createAccountButton.bottomAnchor.constraint(equalTo: logInBackground.bottomAnchor, constant: -50),
-            createAccountButton.centerXAnchor.constraint(equalTo: logInBackground.centerXAnchor)])
+            createAccountButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50),
+            createAccountButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)])
     }
     func setLogoLabelConstraints() {
-        logInBackground.addSubview(logoLabel)
+        view.addSubview(logoLabel)
         logoLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            logoLabel.topAnchor.constraint(equalTo: logInBackground.topAnchor, constant: 70),
-            logoLabel.centerXAnchor.constraint(equalTo: logInBackground.centerXAnchor)])
+            logoLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 70),
+            logoLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)])
+    }
+    func setLoginButtonConstraints() {
+        view.addSubview(loginButton)
+        loginButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            loginButton.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 30),
+            loginButton.centerXAnchor.constraint(equalTo: passwordTextField.centerXAnchor)])
     }
     
 }
