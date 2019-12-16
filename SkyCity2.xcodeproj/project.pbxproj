@@ -14,7 +14,6 @@
 		4D4F1E00238C295E00F91CC9 /* LandMapNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */; };
 		4D4FFF3E238C38920083AEBE /* Mode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4FFF3D238C38920083AEBE /* Mode.swift */; };
 		4D909AB423A2D4D200BBB154 /* BuildingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D909AB323A2D4D200BBB154 /* BuildingNode.swift */; };
-		4D909AB623A2D66A00BBB154 /* CGLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D909AB523A2D66A00BBB154 /* CGLayer.swift */; };
 		4D909AB823A2E5B700BBB154 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4D909AB723A2E5B700BBB154 /* GoogleService-Info.plist */; };
 		4D909ABA23A2EB0400BBB154 /* FirebaseAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D909AB923A2EB0400BBB154 /* FirebaseAuthService.swift */; };
 		4DCC62E82381B8BF009B2DA2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DCC62E72381B8BF009B2DA2 /* AppDelegate.swift */; };
@@ -51,7 +50,6 @@
 		4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandMapNode.swift; sourceTree = "<group>"; };
 		4D4FFF3D238C38920083AEBE /* Mode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mode.swift; sourceTree = "<group>"; };
 		4D909AB323A2D4D200BBB154 /* BuildingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildingNode.swift; sourceTree = "<group>"; };
-		4D909AB523A2D66A00BBB154 /* CGLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGLayer.swift; sourceTree = "<group>"; };
 		4D909AB723A2E5B700BBB154 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4D909AB923A2EB0400BBB154 /* FirebaseAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthService.swift; sourceTree = "<group>"; };
 		4DCC62E42381B8BF009B2DA2 /* SkyCity2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SkyCity2.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,7 +107,6 @@
 				4DCC630D2381B92A009B2DA2 /* PlotNode.swift */,
 				4D909AB323A2D4D200BBB154 /* BuildingNode.swift */,
 				4D4F1DFF238C295E00F91CC9 /* LandMapNode.swift */,
-				4D909AB523A2D66A00BBB154 /* CGLayer.swift */,
 			);
 			path = "Custom Classes";
 			sourceTree = "<group>";
@@ -361,7 +358,6 @@
 				4D909AB423A2D4D200BBB154 /* BuildingNode.swift in Sources */,
 				4D909ABA23A2EB0400BBB154 /* FirebaseAuthService.swift in Sources */,
 				4D2229CD238C70E90039722D /* FileManager.swift in Sources */,
-				4D909AB623A2D66A00BBB154 /* CGLayer.swift in Sources */,
 				4D4F1E00238C295E00F91CC9 /* LandMapNode.swift in Sources */,
 				4DCC630E2381B92A009B2DA2 /* PlotNode.swift in Sources */,
 				4DCC62E82381B8BF009B2DA2 /* AppDelegate.swift in Sources */,

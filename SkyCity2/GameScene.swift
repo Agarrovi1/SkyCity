@@ -13,15 +13,10 @@ import Foundation
 enum NotificationNames: String {
     case modeChanged
     case foodIncreased
-    case updatePlots
 }
 
 class GameScene: SKScene {
     
-    
-//    private var spinnyNode = PlotNode(state: .empty)
-//    addChild(spinnyNode)
-//    spinnyNode.position = view.center
     //MARK: -Properties
     var mode: Mode = .growing {
         didSet {
@@ -77,6 +72,13 @@ class GameScene: SKScene {
         default:
             return
         }
+    }
+    @objc private func handle(notification: Notification) {
+        guard let amount = notification.userInfo?["foodAmount"] as? Int else {
+            return
+        }
+        foodAmount += amount
+        foodLabel.text = "Food: \(foodAmount)"
     }
     
     
@@ -166,14 +168,6 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
-        guard landNode.plots.count > 0 else {return}
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: NotificationNames.updatePlots.rawValue), object: self)
     }
-    @objc private func handle(notification: Notification) {
-        guard let amount = notification.userInfo?["foodAmount"] as? Int else {
-            return
-        }
-        foodAmount += amount
-        foodLabel.text = "Food: \(foodAmount)"
-    }
+    
 }
