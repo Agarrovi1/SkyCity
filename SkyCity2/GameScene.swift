@@ -38,6 +38,7 @@ class GameScene: SKScene {
             foodLabel.text = "Food: \(foodAmount)"
         }
     }
+    var starBitsAmount: Int = 0
     var currentAppUser: AppUser? {
         didSet {
             foodAmount = currentAppUser?.food ?? 0
@@ -97,7 +98,18 @@ class GameScene: SKScene {
             return
         }
         foodAmount += amount
-        foodLabel.text = "Food: \(foodAmount)"
+        //foodLabel.text = "Food: \(foodAmount)"
+        DispatchQueue.global(qos: .background).async {
+            FirestoreService.manager.updateAppUser(id: FirebaseAuthService.manager.currentUser?.uid ?? "", newFoodAmount: self.foodAmount, newStarBitsAmount: self.starBitsAmount) { (result) in
+                switch result {
+                case .failure(let error):
+                    print("Error on GameScene: \(error)")
+                case .success:
+                    print("updated user")
+                }
+            }
+        }
+        
     }
     
     

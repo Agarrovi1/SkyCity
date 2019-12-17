@@ -51,7 +51,7 @@ class PlotNode: SKSpriteNode {
             default:
                 return
             }
-            
+            updatePlotInFirestore()
         }
     }
     
@@ -105,6 +105,7 @@ class PlotNode: SKSpriteNode {
             NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: self, userInfo: ["foodAmount": foodValue])
             state = .empty
         }
+        
     }
 
     private func handleHarvestUpdates() {
@@ -126,6 +127,21 @@ class PlotNode: SKSpriteNode {
         }
     }
 
+    private func updatePlotInFirestore() {
+        DispatchQueue.global(qos: .default).async {
+            FirestoreService.manager.findIdOfPlot(x: Double(self.position.x), y: Double(self.position.y), userId: FirebaseAuthService.manager.currentUser?.uid ?? "") { (result) in
+                FirestoreService.manager.updatePlot(plot: self, result: result) { (newResult) in
+                    switch newResult {
+                    case .failure(let error):
+                        print("Error on PlotNode: \(error)")
+                    case .success:
+                        print("successful update on plot")
+                    }
+                }
+            }
+            
+        }
+    }
     
     //MARK: TODO: refactor this to make an updating label? 
     /*

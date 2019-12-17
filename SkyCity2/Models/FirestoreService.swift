@@ -82,6 +82,37 @@ class FirestoreService {
             }
         }
     }
+    func findIdOfPlot(x: Double,y: Double, userId: String, completionHandler: @escaping (Result<String,Error>) -> ()) {
+        db.collection(FireStoreCollections.plotsOfLand.rawValue).whereField("createdBy", isEqualTo: userId).whereField("x", isEqualTo: x).whereField("y", isEqualTo: y).getDocuments { (snapshot, error) in
+            if let error = error {
+                completionHandler(.failure(error))
+            } else {
+                let farmLand = snapshot?.documents.compactMap({ (snapshot) -> PlotsOfLand? in
+                    let farmID = snapshot.documentID
+                    let farm = PlotsOfLand(from: snapshot.data(), id: farmID)
+                    return farm
+                })
+                if let farmLand = farmLand {
+                    completionHandler(.success(farmLand[0].id))
+                }
+            }
+        }
+    }
+    func updatePlot(plot: PlotNode,result: (Result<String,Error>), completion: @escaping (Result<(),Error>) -> ()) {
+        switch result {
+        case .success(let favId):
+            db.collection(FireStoreCollections.plotsOfLand.rawValue)
+                .document(favId).updateData(["plantTime": Double(plot.plantTime ?? 0.0), "maxAmountTime": plot.maxTimeAmount, "state": plot.state.rawValue, "foodValue": plot.foodValue]) { (error) in
+                    if let error = error {
+                        completion(.failure(error))
+                    } else {
+                        completion(.success(()))
+                    }
+            }
+        case .failure(let error):
+            completion(.failure(error))
+        }
+    }
     
     private init () {}
 }
