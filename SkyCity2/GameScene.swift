@@ -140,7 +140,6 @@ class GameScene: SKScene {
         makeStarBitsLabel()
         makeBuildButton()
         makePlantButton()
-        
     }
     
     deinit {

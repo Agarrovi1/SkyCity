@@ -12,7 +12,7 @@ import UserNotifications
 import Foundation
 
 class PlotNode: SKSpriteNode {
-    enum State {
+    enum State: String {
         case empty
         case seeds
         case harvest
@@ -81,6 +81,21 @@ class PlotNode: SKSpriteNode {
         handlePlotPressed()
     }
     
+    //MARK: - Public Functions
+    func updateState(from firestoreState: String) {
+        switch firestoreState {
+        case State.empty.rawValue:
+            state = .empty
+        case State.seeds.rawValue:
+            state = .seeds
+        case State.harvest.rawValue:
+            state = .harvest
+        case State.layout.rawValue:
+            state = .layout
+        default:
+            state = .empty
+        }
+    }
     
     //MARK: - Private Functions
     private func handlePlotPressed() {

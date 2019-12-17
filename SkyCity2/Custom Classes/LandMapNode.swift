@@ -13,6 +13,11 @@ class LandMapNode: SKTileMapNode {
     //MARK: - Properties
     var delegate: NotificationDelegate?
     var plots = [PlotNode]()
+    var savedPlots = [PlotsOfLand]() {
+        didSet {
+            setupSavedPlots()
+        }
+    }
     private var preLayoutNode = PlotNode(state: .layout)
     
     //MARK: Init
@@ -28,6 +33,7 @@ class LandMapNode: SKTileMapNode {
         isUserInteractionEnabled = true
         
         NotificationCenter.default.addObserver(self, selector: #selector(handle), name: Notification.Name(NotificationNames.modeChanged.rawValue), object: nil)
+        LoadPlots()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -64,6 +70,7 @@ class LandMapNode: SKTileMapNode {
         newNode.color = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
         plots.append(newNode)
         addChild(newNode)
+        saveNew(plot: newNode)
     }
     
     
@@ -104,6 +111,49 @@ class LandMapNode: SKTileMapNode {
     private func updatePlots(isInteractable: Bool) {
         for plot in plots {
             plot.isUserInteractionEnabled = isInteractable
+        }
+    }
+    private func LoadPlots() {
+        DispatchQueue.main.async {
+            FirestoreService.manager.getPlotsFor(userID: FirebaseAuthService.manager.currentUser?.uid ?? "") { [weak self] (result) in
+                switch result {
+                case .failure(let error):
+                    print(error)
+                case .success(let farmLands):
+                    self?.savedPlots = farmLands
+                }
+            }
+        }
+    }
+    private func setupSavedPlots() {
+        for plot in savedPlots {
+            let newPlot = PlotNode(state: .empty)
+            newPlot.delegate = delegate
+            newPlot.position = CGPoint(x: plot.x ?? 0, y: plot.y ?? 0)
+            newPlot.color = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
+            if let plantTime = plot.plantTime {
+                if plantTime == 0.0 {
+                    newPlot.plantTime = nil
+                } else {
+                    newPlot.plantTime = CFAbsoluteTime.init(plantTime)
+                }
+            }
+            newPlot.maxTimeAmount = plot.maxAmountTime ?? 10
+            newPlot.foodValue = plot.foodValue ?? 100
+            newPlot.updateState(from: plot.state ?? "")
+            plots.append(newPlot)
+            addChild(newPlot)
+        }
+    }
+    private func saveNew(plot: PlotNode) {
+        let newSave = PlotsOfLand(x: Double(plot.position.x), y: Double(plot.position.y), plantTime: Double(plot.plantTime ?? 0.0), maxAmountTime: plot.maxTimeAmount, state: plot.state.rawValue, createdBy: FirebaseAuthService.manager.currentUser?.uid ?? "", foodValue: plot.foodValue)
+        FirestoreService.manager.createPlot(newPlot: newSave) { [weak self] (result) in
+            switch result {
+            case .failure(let error):
+                print(error)
+            case .success:
+                print("successfully saved new plot")
+            }
         }
     }
     
