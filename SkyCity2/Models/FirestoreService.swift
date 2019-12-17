@@ -43,6 +43,18 @@ class FirestoreService {
             }
         }
     }
+    func getAppUser(id: String, completion: @escaping(Result<AppUser,Error>) -> ()) {
+        db.collection(FireStoreCollections.users.rawValue).document(id).getDocument { (snapshot, error) in
+            if let error = error {
+                completion(.failure(error))
+            } else if let snapshot = snapshot {
+                let userID = snapshot.documentID
+                if let user = AppUser(from: snapshot.data() ?? [:], id: userID) {
+                    completion(.success(user))
+                }
+            }
+        }
+    }
     
     
     //MARK: PlotsOfLand

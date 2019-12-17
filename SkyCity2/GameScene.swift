@@ -33,7 +33,16 @@ class GameScene: SKScene {
             NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": mode])
         }
     }
-    var foodAmount: Int = 0
+    var foodAmount: Int = 0 {
+        didSet {
+            foodLabel.text = "Food: \(foodAmount)"
+        }
+    }
+    var currentAppUser: AppUser? {
+        didSet {
+            foodAmount = currentAppUser?.food ?? 0
+        }
+    }
 
     
     //MARK: - Objects
@@ -71,6 +80,16 @@ class GameScene: SKScene {
             mode = .planting
         default:
             return
+        }
+    }
+    private func getAppUser() {
+        FirestoreService.manager.getAppUser(id: FirebaseAuthService.manager.currentUser?.uid ?? "") { [weak self] (result) in
+            switch result {
+            case .failure(let error):
+                print(error)
+            case .success(let firestoreUser):
+                self?.currentAppUser = firestoreUser
+            }
         }
     }
     @objc private func handle(notification: Notification) {
@@ -150,6 +169,7 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         setupGameUI(view: view)
          NotificationCenter.default.addObserver(self, selector: #selector(handle), name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: nil)
+        getAppUser()
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch: AnyObject in touches {
