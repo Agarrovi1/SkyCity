@@ -13,6 +13,9 @@ import Foundation
 enum NotificationNames: String {
     case modeChanged
     case foodIncreased
+    case showActionSheet
+    case foodType
+    case isInteractable
 }
 
 class GameScene: SKScene {
@@ -24,11 +27,13 @@ class GameScene: SKScene {
                case .plotting:
                    buildButton.isHidden = false
                    plantButton.isHidden = true
+                makeNotificationForPlots(isInteractive: false)
                case .growing:
                    buildButton.isHidden = true
                    plantButton.isHidden = false
+                   makeNotificationForPlots(isInteractive: false)
                case .planting:
-                print("planting")
+                makeNotificationForPlots(isInteractive: true)
             }
             NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": mode])
         }
@@ -74,14 +79,15 @@ class GameScene: SKScene {
         landNode.placeNewItem()
     }
     private func handlePlantButtonPressed() {
-        switch mode {
-        case .planting:
-            mode = .growing
-        case .growing:
-            mode = .planting
-        default:
-            return
-        }
+//        switch mode {
+//        case .planting:
+//            mode = .growing
+//        case .growing:
+//            mode = .planting
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: self, userInfo: nil)
+//        default:
+//            return
+//        }
     }
     private func getAppUser() {
         FirestoreService.manager.getAppUser(id: FirebaseAuthService.manager.currentUser?.uid ?? "") { [weak self] (result) in
@@ -93,6 +99,11 @@ class GameScene: SKScene {
             }
         }
     }
+    //MARK: Notification Center, Post
+    func makeNotificationForPlots(isInteractive: Bool) {
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.isInteractable.rawValue), object: self, userInfo: ["isInteractable": isInteractive])
+    }
+    
     @objc private func handle(notification: Notification) {
         guard let amount = notification.userInfo?["foodAmount"] as? Int else {
             return

@@ -87,11 +87,12 @@ class GameViewController: UIViewController {
     var signInEmail: UITextField?
     var signInPassword: UITextField?
     
-    
+    //MARK: LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         askForNotificationPermission()
         setupLogInUI()
+        NotificationCenter.default.addObserver(self, selector: #selector(showActionSheet(notification:)), name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: nil)
         
     }
     
@@ -132,10 +133,30 @@ class GameViewController: UIViewController {
         logoLabel.isHidden = true
         loginButton.isHidden = true
     }
+    //MARK: Objc Functions
     @objc private func pressReturnOnEmailTextField() {
         emailTextField.resignFirstResponder()
         passwordTextField.becomeFirstResponder()
     }
+    @objc private func showActionSheet(notification: NSNotification) {
+        let actionSheet = UIAlertController(title: "What to plant?", message: nil, preferredStyle: .actionSheet)
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (_) in
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.growing])
+        }
+        let apple = UIAlertAction(title: "Apple: 10sec, 100 food", style: .default) { (_) in
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.planting])
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodType.rawValue), object: self, userInfo: ["foodAmount": 100, "maxTimeAmount": 10])
+        }
+        let pear = UIAlertAction(title: "Pear: 30min, 500 food", style: .default) { (_) in
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.planting])
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodType.rawValue), object: self, userInfo: ["foodAmount": 500, "maxTimeAmount": (60 * 30)])
+        }
+        actionSheet.addAction(cancel)
+        actionSheet.addAction(apple)
+        actionSheet.addAction(pear)
+        present(actionSheet, animated: true, completion: nil)
+    }
+    
     //MARK: Handling Login
     private func handleLoginResponse(result: (Result<(),Error>)) {
         switch result {
