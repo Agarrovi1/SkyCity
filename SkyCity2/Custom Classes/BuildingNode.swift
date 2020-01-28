@@ -20,11 +20,12 @@ class BuildingNode: SKSpriteNode {
     }
     
     //MARK: - Properties
-    var plantTime: CFAbsoluteTime?
+    var starBitsTime: CFAbsoluteTime?
     var maxTime: Int = 0
-    var maxTimeAmount = 10
-    var foodValue: Int = 100
-    var foodForHarvest: Int = 0
+    var maxTimeAmount = (60 * 5)
+    var foodNeeded = 150
+    var StarBitValue: Int = 100
+    var StarBitsForCollecting: Int = 0
     var mode: Mode = .growing {
         didSet {
             print("changed")
@@ -38,8 +39,8 @@ class BuildingNode: SKSpriteNode {
             switch state {
             case .getStarBits:
                 color = #colorLiteral(red: 0.9411764741, green: 0.4980392158, blue: 0.3529411852, alpha: 1)
-                foodForHarvest = foodValue
-                plantTime = CFAbsoluteTimeGetCurrent()
+                StarBitsForCollecting = StarBitValue
+                starBitsTime = CFAbsoluteTimeGetCurrent()
                 delegate?.makeNotification(title: "SkyCity", message: "Your harvest is ready", timeInterval: Double(maxTimeAmount))
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] (_) in
                     self?.handleBuildingUpdates()
@@ -50,7 +51,7 @@ class BuildingNode: SKSpriteNode {
                 
             case .empty:
                 color = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
-                plantTime = nil
+                starBitsTime = nil
             default:
                 return
             }
@@ -68,6 +69,7 @@ class BuildingNode: SKSpriteNode {
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.state = state
         isUserInteractionEnabled = true
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUserInteraction(notification:)), name: NSNotification.Name(NotificationNames.isInteractable.rawValue), object: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -78,15 +80,16 @@ class BuildingNode: SKSpriteNode {
     private func handleBuildingPressed() {
         if state == .empty {
             state = .getStarBits
+            postTakeFoodNeed()
         } else if state == .collect {
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: self, userInfo: ["foodAmount": foodForHarvest])
+            postStarBitsIncrease()
             state = .empty
         }
         
     }
 
     private func handleBuildingUpdates() {
-        guard let plantTime = plantTime else {
+        guard let plantTime = starBitsTime else {
             return
         }
         let currentTimeAbsolute = CFAbsoluteTimeGetCurrent()
@@ -103,5 +106,17 @@ class BuildingNode: SKSpriteNode {
             break
         }
     }
-
+    @objc private func handleUserInteraction(notification: NSNotification) {
+        guard let isInteractable = notification.userInfo?["isInteractable"] as? Bool else {
+            return
+        }
+        isUserInteractionEnabled = isInteractable
+    }
+    //MARK: - Notification Center, Post
+    private func postStarBitsIncrease() {
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.starBitIncreased.rawValue), object: self, userInfo: ["starBitAmount": StarBitsForCollecting])
+    }
+    private func postTakeFoodNeed() {
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodDecreased.rawValue), object: self, userInfo: ["foodNeeded": foodNeeded])
+    }
 }

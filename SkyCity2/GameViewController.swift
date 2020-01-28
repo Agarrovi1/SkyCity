@@ -19,12 +19,12 @@ class GameViewController: UIViewController {
     private var unNotificationCenter: UNUserNotificationCenter!
     
     //MARK: - Objects
-    var logInBackground: UIImageView = {
+    let logInBackground: UIImageView = {
         let view = UIImageView()
         view.image = UIImage(named: "loginBackground")
         return view
     }()
-    lazy var emailTextField: UITextField = {
+    let emailTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Enter Email"
         textField.font = UIFont(name: "Verdana", size: 14)
@@ -34,7 +34,7 @@ class GameViewController: UIViewController {
         textField.addTarget(self, action: #selector(pressReturnOnEmailTextField), for: .primaryActionTriggered)
         return textField
     }()
-    lazy var passwordTextField: UITextField = {
+    let passwordTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Enter Password"
         textField.font = UIFont(name: "Verdana", size: 14)
@@ -45,7 +45,7 @@ class GameViewController: UIViewController {
         textField.addTarget(self, action: #selector(attemptLogin), for: .primaryActionTriggered)
         return textField
     }()
-    lazy var loginButton: UIButton = {
+    let loginButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("Login", for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -54,10 +54,12 @@ class GameViewController: UIViewController {
         button.layer.cornerRadius = 5
         button.layer.borderColor = UIColor.white.cgColor
         button.layer.borderWidth = 2
+        
+        button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         button.addTarget(self, action: #selector(attemptLogin), for: .touchUpInside)
         return button
     }()
-    var createAccountButton: UIButton = {
+    let createAccountButton: UIButton = {
         let button = UIButton(type: .system)
         let attributedTitle = NSMutableAttributedString(string: "Dont have an account?  ",attributes: [
             NSAttributedString.Key.font: UIFont(name: "Verdana", size: 14)!,
@@ -69,10 +71,11 @@ class GameViewController: UIViewController {
         button.setAttributedTitle(attributedTitle, for: .normal)
         button.backgroundColor = .white
         button.layer.cornerRadius = 10
+        button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
         button.addTarget(self, action: #selector(displayForm), for: .touchUpInside)
         return button
     }()
-    var logoLabel: UILabel = {
+    let logoLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.text = "SkyCity"
@@ -92,8 +95,6 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         askForNotificationPermission()
         setupLogInUI()
-        NotificationCenter.default.addObserver(self, selector: #selector(showActionSheet(notification:)), name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: nil)
-        
     }
     
     //MARK: - Functions
@@ -109,22 +110,23 @@ class GameViewController: UIViewController {
         }
     }
     
-    func setupGameScene() {
+    private func setupGameScene() {
         let scene = GameScene(size: view.frame.size)
         let skView = view as! SKView
         skView.showsNodeCount = true
         skView.showsFPS = true
         skView.presentScene(scene)
+        scene.sceneDelegate = self
         scene.landNode.delegate = self
         hideSubViews()
     }
-    
     
     private func makeAlert(with title: String, and message: String) {
         let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         present(alertVC, animated: true, completion: nil)
     }
+    
     private func hideSubViews() {
         logInBackground.isHidden = true
         emailTextField.isHidden = true
@@ -133,28 +135,61 @@ class GameViewController: UIViewController {
         logoLabel.isHidden = true
         loginButton.isHidden = true
     }
+
+    func makePlantActionSheet() {
+        let actionSheet = UIAlertController(title: "What to plant?", message: nil, preferredStyle: .actionSheet)
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel)
+        let stopPlanting = UIAlertAction(title: "Stop Planting", style: .destructive) { [weak self] (_) in
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.growing])
+            self?.postModeChanged(mode: .growing)
+        }
+        let apple = UIAlertAction(title: "Apple: 10sec, 100 food", style: .default) { [weak self] (_) in
+            self?.postModeChanged(mode: .planting)
+            self?.postFoodType(foodAmount: 100, maxTimeAmount: 10)
+        }
+        let pear = UIAlertAction(title: "Pear: 30min, 500 food", style: .default) { [weak self] (_) in
+            self?.postModeChanged(mode: .planting)
+            self?.postFoodType(foodAmount: 500, maxTimeAmount: (60 * 30))
+        }
+        actionSheet.addAction(cancel)
+        actionSheet.addAction(stopPlanting)
+        actionSheet.addAction(apple)
+        actionSheet.addAction(pear)
+        present(actionSheet, animated: true, completion: nil)
+    }
+    private func makeEditActionSheet() {
+        let actionSheet = UIAlertController(title: "What to build?", message: nil, preferredStyle: .actionSheet)
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let stopBuilding = UIAlertAction(title: "Stop building", style: .destructive) { [weak self] (_) in
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.growing])
+            self?.postModeChanged(mode: .growing)
+        }
+        let makePlots = UIAlertAction(title: "Make plots of land", style: .default) { [weak self] (_) in
+            self?.postModeChanged(mode: .plotting, resource: "plot")
+        }
+        let makeBuilding = UIAlertAction(title: "Make house, cost 150 food", style: .default) { [weak self] (_) in
+            self?.postModeChanged(mode: .plotting, resource: "house")
+        }
+        actionSheet.addAction(cancel)
+        actionSheet.addAction(stopBuilding)
+        actionSheet.addAction(makePlots)
+        actionSheet.addAction(makeBuilding)
+        present(actionSheet, animated: true, completion: nil)
+    }
+    //MARK: Notification Center, Post
+    private func postModeChanged(mode: Mode, resource: String? = nil) {
+        var userInfo: [AnyHashable : Any] = [:]
+        userInfo["mode"] = mode
+        userInfo["resource"] = resource
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: userInfo)
+    }
+    private func postFoodType(foodAmount: Int, maxTimeAmount: Int) {
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodType.rawValue), object: self, userInfo: ["foodAmount": foodAmount, "maxTimeAmount": maxTimeAmount])
+    }
     //MARK: Objc Functions
     @objc private func pressReturnOnEmailTextField() {
         emailTextField.resignFirstResponder()
         passwordTextField.becomeFirstResponder()
-    }
-    @objc private func showActionSheet(notification: NSNotification) {
-        let actionSheet = UIAlertController(title: "What to plant?", message: nil, preferredStyle: .actionSheet)
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel) { (_) in
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.growing])
-        }
-        let apple = UIAlertAction(title: "Apple: 10sec, 100 food", style: .default) { (_) in
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.planting])
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodType.rawValue), object: self, userInfo: ["foodAmount": 100, "maxTimeAmount": 10])
-        }
-        let pear = UIAlertAction(title: "Pear: 30min, 500 food", style: .default) { (_) in
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.planting])
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodType.rawValue), object: self, userInfo: ["foodAmount": 500, "maxTimeAmount": (60 * 30)])
-        }
-        actionSheet.addAction(cancel)
-        actionSheet.addAction(apple)
-        actionSheet.addAction(pear)
-        present(actionSheet, animated: true, completion: nil)
     }
     
     //MARK: Handling Login
@@ -251,10 +286,10 @@ class GameViewController: UIViewController {
         view.addSubview(logInBackground)
         logInBackground.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            logInBackground.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            logInBackground.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            logInBackground.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            logInBackground.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)])
+            logInBackground.topAnchor.constraint(equalTo: view.topAnchor),
+            logInBackground.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            logInBackground.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            logInBackground.bottomAnchor.constraint(equalTo: view.bottomAnchor)])
     }
     func setEmailTextFieldConstraints() {
         view.addSubview(emailTextField)
@@ -330,5 +365,15 @@ extension GameViewController: NotificationDelegate {
 extension GameViewController: UNUserNotificationCenterDelegate {
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.alert,.sound])
+    }
+}
+
+extension GameViewController: GameSceneDelegate {
+    func buttonPressed(senderId: String) {
+        if senderId == "plant" {
+            makePlantActionSheet()
+        } else if senderId == "edit" {
+            makeEditActionSheet()
+        }
     }
 }

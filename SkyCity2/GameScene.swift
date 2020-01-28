@@ -16,26 +16,33 @@ enum NotificationNames: String {
     case showActionSheet
     case foodType
     case isInteractable
+    case starBitIncreased
+    case foodDecreased
+    case editType
+}
+
+protocol GameSceneDelegate: class {
+    func buttonPressed(senderId: String)
 }
 
 class GameScene: SKScene {
-    
+    weak var sceneDelegate: GameSceneDelegate?
     //MARK: -Properties
     var mode: Mode = .growing {
         didSet {
-               switch mode {
-               case .plotting:
-                   buildButton.isHidden = false
-                   plantButton.isHidden = true
-                makeNotificationForPlots(isInteractive: false)
-               case .growing:
-                   buildButton.isHidden = true
-                   plantButton.isHidden = false
-                   makeNotificationForPlots(isInteractive: false)
-               case .planting:
-                makeNotificationForPlots(isInteractive: true)
+            switch mode {
+            case .plotting:
+                buildButton.isHidden = false
+                plantButton.isHidden = true
+                postToPlots(isInteractive: false)
+            case .growing:
+                buildButton.isHidden = true
+                plantButton.isHidden = false
+                postToPlots(isInteractive: false)
+            case .planting:
+                postToPlots(isInteractive: true)
             }
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": mode])
+            postToLandModeChanged()
         }
     }
     var foodAmount: Int = 0 {
@@ -63,16 +70,17 @@ class GameScene: SKScene {
     
     //MARK: - Methods
     private func handleEditButtonPressed() {
-        switch mode {
-        case .plotting:
-            print("done editing")
-            mode = .growing
-        case .growing:
-            print("editing mode")
-            mode = .plotting
-        default:
-            return
-        }
+//        switch mode {
+//        case .plotting:
+//            print("done editing")
+//            mode = .growing
+//        case .growing:
+//            print("editing mode")
+//            mode = .plotting
+//        default:
+//            return
+//        }
+        postShowActionSheet(pressed: "edit")
     }
     
     private func handleBuildButtonPressed() {
@@ -84,7 +92,7 @@ class GameScene: SKScene {
 //            mode = .growing
 //        case .growing:
 //            mode = .planting
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: self, userInfo: nil)
+        postShowActionSheet(pressed: "plant")
 //        default:
 //            return
 //        }
@@ -100,8 +108,15 @@ class GameScene: SKScene {
         }
     }
     //MARK: Notification Center, Post
-    func makeNotificationForPlots(isInteractive: Bool) {
+    private func postToPlots(isInteractive: Bool) {
         NotificationCenter.default.post(name: Notification.Name(NotificationNames.isInteractable.rawValue), object: self, userInfo: ["isInteractable": isInteractive])
+    }
+    private func postToLandModeChanged() {
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": mode])
+    }
+    private func postShowActionSheet(pressed: String) {
+        sceneDelegate?.buttonPressed(senderId: pressed)
+//        NotificationCenter.default.post(name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: self, userInfo: ["pressed": pressed])
     }
     
     @objc private func handle(notification: Notification) {
@@ -120,7 +135,6 @@ class GameScene: SKScene {
                 }
             }
         }
-        
     }
     
     

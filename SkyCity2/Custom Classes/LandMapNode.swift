@@ -19,6 +19,7 @@ class LandMapNode: SKTileMapNode {
         }
     }
     private var preLayoutNode = PlotNode(state: .layout)
+    private var preLayoutBuildingNode = BuildingNode(state: .layout)
     
     //MARK: Init
     override init() {
@@ -108,10 +109,11 @@ class LandMapNode: SKTileMapNode {
         preLayoutNode.isUserInteractionEnabled = false
         addChild(preLayoutNode)
     }
-    private func updatePlots(isInteractable: Bool) {
-        for plot in plots {
-            plot.isUserInteractionEnabled = isInteractable
-        }
+    private func setPreLayoutBuildingNode() {
+        preLayoutBuildingNode.color = #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 0.5543931935)
+        preLayoutBuildingNode.zPosition = 2
+        preLayoutBuildingNode.isUserInteractionEnabled = false
+        addChild(preLayoutBuildingNode)
     }
     private func LoadPlots() {
         DispatchQueue.main.async {
@@ -156,7 +158,7 @@ class LandMapNode: SKTileMapNode {
             }
         }
     }
-    
+    //MARK: - Objc Func
     @objc private func handle(notification: NSNotification) {
         guard let mode = notification.userInfo?["mode"] as? Mode else {
             return
@@ -164,12 +166,17 @@ class LandMapNode: SKTileMapNode {
         switch mode {
         case .growing:
             preLayoutNode.removeFromParent()
-            updatePlots(isInteractable: true)
         case .plotting:
-            setPreLayoutNode()
-            updatePlots(isInteractable: false)
+            guard let resource = notification.userInfo?["resource"] as? String else {
+                return
+            }
+            if resource == "plot" {
+                setPreLayoutNode()
+            } else if resource == "house" {
+                setPreLayoutBuildingNode()
+            }
         case .planting:
-            updatePlots(isInteractable: true)
+            break
         }
     }
 }

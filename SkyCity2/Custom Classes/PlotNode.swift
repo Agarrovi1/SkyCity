@@ -68,7 +68,7 @@ class PlotNode: SKSpriteNode {
         self.state = state
         isUserInteractionEnabled = true
         NotificationCenter.default.addObserver(self, selector: #selector(handleChosenFood(notification:)), name: NSNotification.Name(NotificationNames.foodType.rawValue), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleChosenFood(notification:)), name: NSNotification.Name(NotificationNames.isInteractable.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUserInteraction(notification:)), name: NSNotification.Name(NotificationNames.isInteractable.rawValue), object: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
