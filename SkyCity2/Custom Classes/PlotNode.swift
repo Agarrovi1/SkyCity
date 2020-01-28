@@ -24,6 +24,7 @@ class PlotNode: SKSpriteNode {
     var maxTime: Int = 0 
     var maxTimeAmount = 10
     var foodValue: Int = 100
+    var foodForHarvest: Int = 0
     var mode: Mode = .growing {
         didSet {
             print("changed")
@@ -37,6 +38,7 @@ class PlotNode: SKSpriteNode {
             switch state {
             case .seeds:
                 color = #colorLiteral(red: 0.5738074183, green: 0.5655357838, blue: 0, alpha: 1)
+                foodForHarvest = foodValue
                 plantTime = CFAbsoluteTimeGetCurrent()
                 delegate?.makeNotification(title: "SkyCity", message: "Your harvest is ready", timeInterval: Double(maxTimeAmount))
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] (_) in
@@ -45,6 +47,7 @@ class PlotNode: SKSpriteNode {
                 print("planted seeds")
             case .harvest:
                 color = #colorLiteral(red: 0.2745098174, green: 0.4862745106, blue: 0.1411764771, alpha: 1)
+                
             case .empty:
                 color = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
                 plantTime = nil
@@ -64,7 +67,8 @@ class PlotNode: SKSpriteNode {
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.state = state
         isUserInteractionEnabled = true
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleChosenFood(notification:)), name: NSNotification.Name(NotificationNames.foodType.rawValue), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleUserInteraction(notification:)), name: NSNotification.Name(NotificationNames.isInteractable.rawValue), object: nil)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -102,7 +106,7 @@ class PlotNode: SKSpriteNode {
         if state == .empty {
             state = .seeds
         } else if state == .harvest {
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: self, userInfo: ["foodAmount": foodValue])
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: self, userInfo: ["foodAmount": foodForHarvest])
             state = .empty
         }
         
@@ -141,6 +145,22 @@ class PlotNode: SKSpriteNode {
             }
             
         }
+    }
+    @objc private func handleChosenFood(notification: NSNotification) {
+        guard let chosenFoodAmount = notification.userInfo?["foodAmount"] as? Int else {
+            return
+        }
+        guard let chosenFoodTime = notification.userInfo?["maxTimeAmount"] as? Int else {
+            return
+        }
+        foodValue = chosenFoodAmount
+        maxTimeAmount = chosenFoodTime
+    }
+    @objc private func handleUserInteraction(notification: NSNotification) {
+        guard let isInteractable = notification.userInfo?["isInteractable"] as? Bool else {
+            return
+        }
+        isUserInteractionEnabled = isInteractable
     }
     
     //MARK: TODO: refactor this to make an updating label? 
