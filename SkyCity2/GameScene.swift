@@ -12,13 +12,13 @@ import Foundation
 
 enum NotificationNames: String {
     case modeChanged
-    case foodIncreased
+    case foodChanged
     case showActionSheet
     case foodType
     case isInteractable
     case starBitIncreased
-    case foodDecreased
     case editType
+    case hideBuildButton
 }
 
 protocol GameSceneDelegate: class {
@@ -84,7 +84,14 @@ class GameScene: SKScene {
     }
     
     private func handleBuildButtonPressed() {
-        landNode.placeNewItem()
+        switch landNode.resourceState {
+        case .house:
+            landNode.placeNewBuilding()
+        case .plot:
+            landNode.placeNewItem()
+        case .none:
+            return
+        }
     }
     private func handlePlantButtonPressed() {
 //        switch mode {
@@ -119,6 +126,7 @@ class GameScene: SKScene {
 //        NotificationCenter.default.post(name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: self, userInfo: ["pressed": pressed])
     }
     
+    //MARK: - Objc Func
     @objc private func handle(notification: Notification) {
         guard let amount = notification.userInfo?["foodAmount"] as? Int else {
             return
@@ -205,7 +213,8 @@ class GameScene: SKScene {
     //MARK: - Override Methods
     override func didMove(to view: SKView) {
         setupGameUI(view: view)
-         NotificationCenter.default.addObserver(self, selector: #selector(handle), name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: nil)
+         NotificationCenter.default.addObserver(self, selector: #selector(handle), name: Notification.Name(NotificationNames.foodChanged.rawValue), object: nil)
+        
         getAppUser()
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

@@ -12,7 +12,7 @@ import UserNotifications
 import Foundation
 
 class BuildingNode: SKSpriteNode {
-    enum State {
+    enum State: String {
         case empty
         case getStarBits
         case collect
@@ -24,8 +24,8 @@ class BuildingNode: SKSpriteNode {
     var maxTime: Int = 0
     var maxTimeAmount = (60 * 5)
     var foodNeeded = 150
-    var StarBitValue: Int = 100
-    var StarBitsForCollecting: Int = 0
+    var starBitValue: Int = 100
+    var starBitsForCollecting: Int = 0
     var mode: Mode = .growing {
         didSet {
             print("changed")
@@ -39,7 +39,7 @@ class BuildingNode: SKSpriteNode {
             switch state {
             case .getStarBits:
                 color = #colorLiteral(red: 0.9411764741, green: 0.4980392158, blue: 0.3529411852, alpha: 1)
-                StarBitsForCollecting = StarBitValue
+                starBitsForCollecting = starBitValue
                 starBitsTime = CFAbsoluteTimeGetCurrent()
                 delegate?.makeNotification(title: "SkyCity", message: "Your harvest is ready", timeInterval: Double(maxTimeAmount))
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] (_) in
@@ -75,8 +75,26 @@ class BuildingNode: SKSpriteNode {
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     
     //MARK: - Methods
+    func updateState(from firestoreState: String) {
+        switch firestoreState {
+        case State.empty.rawValue:
+            state = .empty
+        case State.getStarBits.rawValue:
+            state = .getStarBits
+        case State.collect.rawValue:
+            state = .collect
+        case State.layout.rawValue:
+            state = .layout
+        default:
+            state = .empty
+        }
+    }
+    
     private func handleBuildingPressed() {
         if state == .empty {
             state = .getStarBits
@@ -114,9 +132,9 @@ class BuildingNode: SKSpriteNode {
     }
     //MARK: - Notification Center, Post
     private func postStarBitsIncrease() {
-        NotificationCenter.default.post(name: Notification.Name(NotificationNames.starBitIncreased.rawValue), object: self, userInfo: ["starBitAmount": StarBitsForCollecting])
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.starBitIncreased.rawValue), object: self, userInfo: ["starBitAmount": starBitsForCollecting])
     }
     private func postTakeFoodNeed() {
-        NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodDecreased.rawValue), object: self, userInfo: ["foodNeeded": foodNeeded])
+        NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodChanged.rawValue), object: self, userInfo: ["foodNeeded": -foodNeeded])
     }
 }

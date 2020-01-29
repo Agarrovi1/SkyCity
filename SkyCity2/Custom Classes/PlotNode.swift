@@ -106,7 +106,7 @@ class PlotNode: SKSpriteNode {
         if state == .empty {
             state = .seeds
         } else if state == .harvest {
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: self, userInfo: ["foodAmount": foodForHarvest])
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodChanged.rawValue), object: self, userInfo: ["foodAmount": foodForHarvest])
             state = .empty
         }
         

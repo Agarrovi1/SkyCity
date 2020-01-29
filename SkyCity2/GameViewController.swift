@@ -16,6 +16,7 @@ class GameViewController: UIViewController {
     //MARK: - Properties
     
     private var unNotificationCenter: UNUserNotificationCenter!
+    private var scene = GameScene()
     
     //MARK: - Objects
     
@@ -27,6 +28,10 @@ class GameViewController: UIViewController {
         askForNotificationPermission()
         setupGameScene()
         
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     
@@ -44,7 +49,7 @@ class GameViewController: UIViewController {
     
     private func setupGameScene() {
         let frame = view.frame
-        let scene = GameScene(size: view.frame.size)
+        scene = GameScene(size: view.frame.size)
         self.view = SKView(frame: frame)
         let skView = view as! SKView
         skView.showsNodeCount = true
@@ -90,14 +95,15 @@ class GameViewController: UIViewController {
         let actionSheet = UIAlertController(title: "What to build?", message: nil, preferredStyle: .actionSheet)
         let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         let stopBuilding = UIAlertAction(title: "Stop building", style: .destructive) { [weak self] (_) in
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.modeChanged.rawValue), object: self, userInfo: ["mode": Mode.growing])
             self?.postModeChanged(mode: .growing)
         }
         let makePlots = UIAlertAction(title: "Make plots of land", style: .default) { [weak self] (_) in
             self?.postModeChanged(mode: .plotting, resource: "plot")
+            self?.scene.mode = .plotting
         }
         let makeBuilding = UIAlertAction(title: "Make house, cost 150 food", style: .default) { [weak self] (_) in
             self?.postModeChanged(mode: .plotting, resource: "house")
+            self?.scene.mode = .plotting
         }
         actionSheet.addAction(cancel)
         actionSheet.addAction(stopBuilding)
