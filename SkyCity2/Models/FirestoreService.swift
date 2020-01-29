@@ -12,6 +12,7 @@ import FirebaseFirestore
 enum FireStoreCollections: String {
     case users
     case plotsOfLand
+    case buildings
     
 }
 
@@ -103,6 +104,63 @@ class FirestoreService {
         case .success(let favId):
             db.collection(FireStoreCollections.plotsOfLand.rawValue)
                 .document(favId).updateData(["plantTime": Double(plot.plantTime ?? 0.0), "maxAmountTime": plot.maxTimeAmount, "state": plot.state.rawValue, "foodValue": plot.foodValue]) { (error) in
+                    if let error = error {
+                        completion(.failure(error))
+                    } else {
+                        completion(.success(()))
+                    }
+            }
+        case .failure(let error):
+            completion(.failure(error))
+        }
+    }
+    
+    //MARK: Buildings
+    func createBuilding(newBuilding: Buildings, completion: @escaping (Result<(),Error>) -> ()) {
+        let fields = newBuilding.fieldsDict
+        db.collection(FireStoreCollections.buildings.rawValue).document(newBuilding.id).setData(fields) { (error) in
+            if let error = error {
+                completion(.failure(error))
+                print(error)
+            }
+            completion(.success(()))
+        }
+    }
+    func getBuildingsFor(userID: String,completion: @escaping (Result<[Buildings],Error>) -> ()) {
+        db.collection(FireStoreCollections.buildings.rawValue).whereField("createdBy", isEqualTo: userID).getDocuments { (snapshot, error) in
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                let buildings = snapshot?.documents.compactMap({ (snapshot) -> Buildings? in
+                    let buildingID = snapshot.documentID
+                    let building = Buildings(from: snapshot.data(), id: buildingID)
+                    return building
+                })
+                completion(.success(buildings ?? []))
+            }
+        }
+    }
+    func findIdOfBuilding(x: Double,y: Double, userId: String, completionHandler: @escaping (Result<String,Error>) -> ()) {
+        db.collection(FireStoreCollections.buildings.rawValue).whereField("createdBy", isEqualTo: userId).whereField("x", isEqualTo: x).whereField("y", isEqualTo: y).getDocuments { (snapshot, error) in
+            if let error = error {
+                completionHandler(.failure(error))
+            } else {
+                let buildingLand = snapshot?.documents.compactMap({ (snapshot) -> Buildings? in
+                    let buildingID = snapshot.documentID
+                    let building = Buildings(from: snapshot.data(), id: buildingID)
+                    return building
+                })
+                if let buildingLand = buildingLand {
+                    completionHandler(.success(buildingLand[0].id))
+                }
+            }
+        }
+    }
+    func updateBuilding(building: BuildingNode,result: (Result<String,Error>), completion: @escaping (Result<(),Error>) -> ()) {
+        switch result {
+        case .success(let favId):
+            db.collection(FireStoreCollections.buildings.rawValue)
+                .document(favId).updateData(["gettingTime": Double(building.starBitsTime ?? 0.0), "maxAmountTime": building.maxTimeAmount, "state": building.state.rawValue, "starBitValue": building.starBitValue]) { (error) in
                     if let error = error {
                         completion(.failure(error))
                     } else {
