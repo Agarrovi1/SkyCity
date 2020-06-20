@@ -25,4 +25,5 @@ I love little farming games, the nature of collecting after work or errands is r
 * The green land is hospitable land, different things can be built on it
 * The yellow small squares are plots of land that you can plant crops and harvest food from
 * The larger gray sqare are buildings that can consume food to produce Starbits
+
 ![Example of land with harvest plots and building](https://github.com/Agarrovi1/SkyCity/blob/master/Images/Screen%20Shot%202020-06-20%20at%2012.27.18%20PM.png | width=343)
