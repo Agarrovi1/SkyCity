@@ -30,5 +30,8 @@ I love little farming games, the nature of collecting after work or errands is r
 
 * Clicking the red button (top right) will prompt user what to build, then the user can place it whereever there is available space
 
+<img src=https://github.com/Agarrovi1/SkyCity/blob/master/Images/Screen%20Shot%202020-06-20%20at%2012.51.23%20PM.png alt=What to build width=343 height=743>
+
+
 
 
