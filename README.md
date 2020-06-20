@@ -21,10 +21,14 @@ I love little farming games, the nature of collecting after work or errands is r
 * SpriteKit
 
 
-***The app so far***
+**The app so far**
 * The green land is hospitable land, different things can be built on it
 * The yellow small squares are plots of land that you can plant crops and harvest food from
 * The larger gray sqare are buildings that can consume food to produce Starbits
 
 <img src=https://github.com/Agarrovi1/SkyCity/blob/master/Images/Screen%20Shot%202020-06-20%20at%2012.27.18%20PM.png alt=Example of land with harvest plots and building width=343 height=743>
+
+* Clicking the red button (top right) will prompt user what to build, then the user can place it whereever there is available space
+
+
 
