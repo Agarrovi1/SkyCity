@@ -34,4 +34,4 @@ I love little farming games, the nature of collecting after work or errands is r
 
 * Clicking the green button (lower left will prompt the user what to plant, then the user can select empty plots (yellow) and plant there
 
-
+<img src=https://github.com/Agarrovi1/SkyCity/blob/master/Images/Screen%20Shot%202020-06-20%20at%2012.56.12%20PM.png alt=What to plant width=343 height=743>
