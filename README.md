@@ -19,6 +19,8 @@ I love little farming games, the nature of collecting after work or errands is r
 
 **Technologies used**
 * SpriteKit
+* UIKit
+* Firebase
 
 
 **The app so far**
