@@ -17,7 +17,7 @@ Researchers have found a planet that with hospitable atmosphere and are trying b
 I love little farming games, the nature of collecting after work or errands is really calming. I enjoy building things from scratch, it gives them a personal touch. This game lets me build a farm in its sci-fi setting.
 
 
-**New Technologies**
+**Technologies used**
 * SpriteKit
 
 
