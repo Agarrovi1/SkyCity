@@ -31,7 +31,6 @@ class LandMapNode: SKTileMapNode {
         }
     }
     
-    
     private var preLayoutNode = PlotNode(state: .layout)
     private var preLayoutBuildingNode = BuildingNode(state: .layout)
     
@@ -84,7 +83,7 @@ class LandMapNode: SKTileMapNode {
         }
     }
     
-    func placeNewItem() {
+    public func placeNewItem() {
         guard checkIfPreLayoutNodeIsValid(), let newNode = self.preLayoutNode.copy() as? PlotNode else {
             return
         }
@@ -97,7 +96,7 @@ class LandMapNode: SKTileMapNode {
         addChild(newNode)
         saveNew(plot: newNode)
     }
-    func placeNewBuilding() {
+    public func placeNewBuilding() {
         guard isPreLayoutBuildingNodeValid(), let newNode = self.preLayoutBuildingNode.copy() as? BuildingNode else {
             return
         }
@@ -112,7 +111,6 @@ class LandMapNode: SKTileMapNode {
         
         NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodChanged.rawValue), object: self, userInfo: ["foodAmount": -150])
     }
-    
     
     //MARK: - Private Functions
     private func checkIfPreLayoutNodeIsValid() -> Bool {
@@ -156,9 +154,7 @@ class LandMapNode: SKTileMapNode {
         guard let parent = parent else {
             return true
         }
-        let preLayoutNodeFrameInParent = CGRect(origin: convert(preLayoutBuildingNode.frame.origin, to: parent),
-                                                size: preLayoutBuildingNode.frame.size)
-
+        let preLayoutNodeFrameInParent = CGRect(origin: convert(preLayoutBuildingNode.frame.origin, to: parent), size: preLayoutBuildingNode.frame.size)
         return preLayoutNodeFrameInParent.intersection(frame) == preLayoutNodeFrameInParent
     }
     private func changeOutlineColor() {
@@ -185,7 +181,6 @@ class LandMapNode: SKTileMapNode {
     }
     
     //MARK: Firestore, Plots
-    
     private func LoadPlots() {
         DispatchQueue.main.async {
             FirestoreService.manager.getPlotsFor(userID: FirebaseAuthService.manager.currentUser?.uid ?? "") { [weak self] (result) in
@@ -259,7 +254,6 @@ class LandMapNode: SKTileMapNode {
     private func setupSavedBuildings() {
         for building in savedBuildings {
             let newBuilding = BuildingNode(state: .empty)
-            //newPlot.delegate = delegate
             newBuilding.position = CGPoint(x: building.x ?? 0, y: building.y ?? 0)
             newBuilding.color = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
             if let starBitTime = building.gettingTime {
@@ -276,7 +270,6 @@ class LandMapNode: SKTileMapNode {
             addChild(newBuilding)
         }
     }
-    
     
     //MARK: - Objc Func
     @objc private func handle(notification: NSNotification) {

@@ -55,7 +55,6 @@ class BuildingNode: SKSpriteNode {
             default:
                 return
             }
-            //updatePlotInFirestore()
         }
     }
     
@@ -103,7 +102,6 @@ class BuildingNode: SKSpriteNode {
             postStarBitsIncrease()
             state = .empty
         }
-        
     }
 
     private func handleBuildingUpdates() {
