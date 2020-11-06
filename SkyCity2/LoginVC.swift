@@ -11,7 +11,6 @@ import FirebaseAuth
 
 class LoginVC: UIViewController {
     
-    
     //MARK: - Objects
     let logInBackground: UIImageView = {
         let view = UIImageView()
@@ -80,18 +79,15 @@ class LoginVC: UIViewController {
         return label
     }()
     
-    
     var signInEmail: UITextField?
     var signInPassword: UITextField?
     
     //MARK: - Functions
-    
     private func makeAlert(with title: String, and message: String) {
         let alertVC = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertVC.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         present(alertVC, animated: true, completion: nil)
     }
-    
     private func segueToGameVC() {
         let gameVC = GameViewController()
         
@@ -193,7 +189,7 @@ class LoginVC: UIViewController {
     }
     
     //MARK: - Constraints
-    func setupLogInUI() {
+    private func setupLogInUI() {
         setBackroundImageConstraints()
         setEmailTextFieldConstraints()
         setPasswordTextFieldConstraints()
@@ -201,7 +197,7 @@ class LoginVC: UIViewController {
         setLogoLabelConstraints()
         setLoginButtonConstraints()
     }
-    func setBackroundImageConstraints() {
+    private func setBackroundImageConstraints() {
         view.addSubview(logInBackground)
         logInBackground.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -210,7 +206,7 @@ class LoginVC: UIViewController {
             logInBackground.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             logInBackground.bottomAnchor.constraint(equalTo: view.bottomAnchor)])
     }
-    func setEmailTextFieldConstraints() {
+    private func setEmailTextFieldConstraints() {
         view.addSubview(emailTextField)
         emailTextField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -218,7 +214,7 @@ class LoginVC: UIViewController {
             emailTextField.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             emailTextField.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)])
     }
-    func setPasswordTextFieldConstraints() {
+    private func setPasswordTextFieldConstraints() {
         view.addSubview(passwordTextField)
         passwordTextField.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -226,21 +222,21 @@ class LoginVC: UIViewController {
             passwordTextField.leadingAnchor.constraint(equalTo: emailTextField.leadingAnchor),
             passwordTextField.trailingAnchor.constraint(equalTo: emailTextField.trailingAnchor)])
     }
-    func setSignInButtonConstraints() {
+    private func setSignInButtonConstraints() {
         view.addSubview(createAccountButton)
         createAccountButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             createAccountButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50),
             createAccountButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)])
     }
-    func setLogoLabelConstraints() {
+    private func setLogoLabelConstraints() {
         view.addSubview(logoLabel)
         logoLabel.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             logoLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 70),
             logoLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)])
     }
-    func setLoginButtonConstraints() {
+    private func setLoginButtonConstraints() {
         view.addSubview(loginButton)
         loginButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -252,9 +248,7 @@ class LoginVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loginCurrentUser()
-
     }
-
 }
 
 
