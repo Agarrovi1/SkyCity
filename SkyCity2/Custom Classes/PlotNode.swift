@@ -106,10 +106,9 @@ class PlotNode: SKSpriteNode {
         if state == .empty {
             state = .seeds
         } else if state == .harvest {
-            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: self, userInfo: ["foodAmount": foodForHarvest])
+            NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodChanged.rawValue), object: self, userInfo: ["foodAmount": foodForHarvest])
             state = .empty
         }
-        
     }
 
     private func handleHarvestUpdates() {
@@ -143,7 +142,6 @@ class PlotNode: SKSpriteNode {
                     }
                 }
             }
-            
         }
     }
     @objc private func handleChosenFood(notification: NSNotification) {
@@ -163,16 +161,4 @@ class PlotNode: SKSpriteNode {
         isUserInteractionEnabled = isInteractable
     }
     
-    //MARK: TODO: refactor this to make an updating label? 
-    /*
-     func updateStockingTimerText() {
-       let stockingTimeTotal = CFTimeInterval(Float(maxAmount) * stockingSpeed)
-       let currentTime = CFAbsoluteTimeGetCurrent()
-       let timePassed = currentTime - lastStateSwitchTime
-       let stockingTimeLeft = stockingTimeTotal - timePassed
-       stockingTimer.text = String(format: "%.0f", stockingTimeLeft)
-     }
-
-     */
-
 }

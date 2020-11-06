@@ -12,13 +12,13 @@ import Foundation
 
 enum NotificationNames: String {
     case modeChanged
-    case foodIncreased
+    case foodChanged
     case showActionSheet
     case foodType
     case isInteractable
     case starBitIncreased
-    case foodDecreased
     case editType
+    case hideBuildButton
 }
 
 protocol GameSceneDelegate: class {
@@ -70,32 +70,21 @@ class GameScene: SKScene {
     
     //MARK: - Methods
     private func handleEditButtonPressed() {
-//        switch mode {
-//        case .plotting:
-//            print("done editing")
-//            mode = .growing
-//        case .growing:
-//            print("editing mode")
-//            mode = .plotting
-//        default:
-//            return
-//        }
         postShowActionSheet(pressed: "edit")
     }
     
     private func handleBuildButtonPressed() {
-        landNode.placeNewItem()
+        switch landNode.resourceState {
+        case .house:
+            landNode.placeNewBuilding()
+        case .plot:
+            landNode.placeNewItem()
+        case .none:
+            return
+        }
     }
     private func handlePlantButtonPressed() {
-//        switch mode {
-//        case .planting:
-//            mode = .growing
-//        case .growing:
-//            mode = .planting
         postShowActionSheet(pressed: "plant")
-//        default:
-//            return
-//        }
     }
     private func getAppUser() {
         FirestoreService.manager.getAppUser(id: FirebaseAuthService.manager.currentUser?.uid ?? "") { [weak self] (result) in
@@ -116,15 +105,14 @@ class GameScene: SKScene {
     }
     private func postShowActionSheet(pressed: String) {
         sceneDelegate?.buttonPressed(senderId: pressed)
-//        NotificationCenter.default.post(name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: self, userInfo: ["pressed": pressed])
     }
     
+    //MARK: - Objc Func
     @objc private func handle(notification: Notification) {
         guard let amount = notification.userInfo?["foodAmount"] as? Int else {
             return
         }
         foodAmount += amount
-        //foodLabel.text = "Food: \(foodAmount)"
         DispatchQueue.global(qos: .background).async {
             FirestoreService.manager.updateAppUser(id: FirebaseAuthService.manager.currentUser?.uid ?? "", newFoodAmount: self.foodAmount, newStarBitsAmount: self.starBitsAmount) { (result) in
                 switch result {
@@ -137,9 +125,8 @@ class GameScene: SKScene {
         }
     }
     
-    
     //MARK: - SetUp
-    func setCloudBgTexture() {
+    private func setCloudBgTexture() {
         let bgTexture = SKTexture(imageNamed: "clouds")
         let bgDefinition = SKTileDefinition(texture: bgTexture, size: CGSize(width: 40, height: 40))
         let bgGroup = SKTileGroup(tileDefinition: bgDefinition)
@@ -149,19 +136,18 @@ class GameScene: SKScene {
         bgNode.setScale(1)
         bgNode.fill(with: bgGroup)
         self.addChild(bgNode)
-
     }
-    func makeEditButton() {
+    private func makeEditButton() {
         editButton = SKSpriteNode(color: SKColor.red, size: CGSize(width: 100, height: 44))
         editButton.position = CGPoint(x:self.frame.maxX - 70, y:self.frame.maxY - 70)
         self.addChild(editButton)
     }
-    func makePlantButton() {
+    private func makePlantButton() {
         plantButton = SKSpriteNode(color: SKColor.green, size: CGSize(width: 100, height: 44))
         plantButton.position = CGPoint(x:self.frame.minX + 70, y:self.frame.minY + 70)
         self.addChild(plantButton)
     }
-    func makeFoodLabel() {
+    private func makeFoodLabel() {
         foodLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
         foodLabel.fontSize = 17
         foodLabel.position = CGPoint(x: self.frame.minX + 50, y: self.frame.maxY - 70)
@@ -171,7 +157,7 @@ class GameScene: SKScene {
         foodLabel.color = .black
         self.addChild(foodLabel)
     }
-    func makeStarBitsLabel() {
+    private func makeStarBitsLabel() {
         starBitsLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
         starBitsLabel.fontSize = 17
         starBitsLabel.position = CGPoint(x: foodLabel.position.x, y: foodLabel.position.y - 20)
@@ -181,13 +167,13 @@ class GameScene: SKScene {
         self.addChild(starBitsLabel)
     }
     
-    func makeBuildButton() {
+    private func makeBuildButton() {
         buildButton = SKSpriteNode(color: SKColor.systemBlue, size: CGSize(width: 100, height: 44))
         buildButton.position = CGPoint(x:self.frame.maxX - 70, y:self.frame.minY + 70)
         buildButton.isHidden = true
         self.addChild(buildButton)
     }
-    func setupGameUI(view: SKView) {
+    private func setupGameUI(view: SKView) {
         setCloudBgTexture()
         addChild(landNode)
         landNode.position = view.center
@@ -197,7 +183,6 @@ class GameScene: SKScene {
         makeBuildButton()
         makePlantButton()
     }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -205,12 +190,12 @@ class GameScene: SKScene {
     //MARK: - Override Methods
     override func didMove(to view: SKView) {
         setupGameUI(view: view)
-         NotificationCenter.default.addObserver(self, selector: #selector(handle), name: Notification.Name(NotificationNames.foodIncreased.rawValue), object: nil)
+         NotificationCenter.default.addObserver(self, selector: #selector(handle), name: Notification.Name(NotificationNames.foodChanged.rawValue), object: nil)
+        
         getAppUser()
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch: AnyObject in touches {
-            // Get the location of the touch in this scene
             let location = touch.location(in: self)
             if editButton.contains(location) {
                 handleEditButtonPressed()
@@ -221,9 +206,4 @@ class GameScene: SKScene {
             }
         }
     }
-    
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-    }
-    
 }
