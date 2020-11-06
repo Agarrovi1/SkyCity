@@ -70,16 +70,6 @@ class GameScene: SKScene {
     
     //MARK: - Methods
     private func handleEditButtonPressed() {
-//        switch mode {
-//        case .plotting:
-//            print("done editing")
-//            mode = .growing
-//        case .growing:
-//            print("editing mode")
-//            mode = .plotting
-//        default:
-//            return
-//        }
         postShowActionSheet(pressed: "edit")
     }
     
@@ -94,15 +84,7 @@ class GameScene: SKScene {
         }
     }
     private func handlePlantButtonPressed() {
-//        switch mode {
-//        case .planting:
-//            mode = .growing
-//        case .growing:
-//            mode = .planting
         postShowActionSheet(pressed: "plant")
-//        default:
-//            return
-//        }
     }
     private func getAppUser() {
         FirestoreService.manager.getAppUser(id: FirebaseAuthService.manager.currentUser?.uid ?? "") { [weak self] (result) in
@@ -123,7 +105,6 @@ class GameScene: SKScene {
     }
     private func postShowActionSheet(pressed: String) {
         sceneDelegate?.buttonPressed(senderId: pressed)
-//        NotificationCenter.default.post(name: Notification.Name(NotificationNames.showActionSheet.rawValue), object: self, userInfo: ["pressed": pressed])
     }
     
     //MARK: - Objc Func
@@ -132,7 +113,6 @@ class GameScene: SKScene {
             return
         }
         foodAmount += amount
-        //foodLabel.text = "Food: \(foodAmount)"
         DispatchQueue.global(qos: .background).async {
             FirestoreService.manager.updateAppUser(id: FirebaseAuthService.manager.currentUser?.uid ?? "", newFoodAmount: self.foodAmount, newStarBitsAmount: self.starBitsAmount) { (result) in
                 switch result {
@@ -145,7 +125,6 @@ class GameScene: SKScene {
         }
     }
     
-    
     //MARK: - SetUp
     func setCloudBgTexture() {
         let bgTexture = SKTexture(imageNamed: "clouds")
@@ -157,7 +136,6 @@ class GameScene: SKScene {
         bgNode.setScale(1)
         bgNode.fill(with: bgGroup)
         self.addChild(bgNode)
-
     }
     func makeEditButton() {
         editButton = SKSpriteNode(color: SKColor.red, size: CGSize(width: 100, height: 44))
@@ -205,7 +183,6 @@ class GameScene: SKScene {
         makeBuildButton()
         makePlantButton()
     }
-    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -219,7 +196,6 @@ class GameScene: SKScene {
     }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch: AnyObject in touches {
-            // Get the location of the touch in this scene
             let location = touch.location(in: self)
             if editButton.contains(location) {
                 handleEditButtonPressed()
@@ -230,9 +206,4 @@ class GameScene: SKScene {
             }
         }
     }
-    
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
-    }
-    
 }
