@@ -16,12 +16,12 @@ enum FireStoreCollections: String {
     
 }
 
-
-
 class FirestoreService {
     static let manager = FirestoreService()
     
     private let db = Firestore.firestore()
+    
+    private init () {}
     
     //MARK: AppUsers
     func createAppUser(user: AppUser, completion: @escaping (Result<(), Error>) -> ()) {
@@ -56,7 +56,6 @@ class FirestoreService {
             }
         }
     }
-    
     
     //MARK: PlotsOfLand
     func createPlot(newPlot: PlotsOfLand, completion: @escaping (Result<(),Error>) -> ()) {
@@ -172,5 +171,4 @@ class FirestoreService {
         }
     }
     
-    private init () {}
 }
