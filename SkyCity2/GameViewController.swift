@@ -14,12 +14,8 @@ import UserNotifications
 class GameViewController: UIViewController {
     
     //MARK: - Properties
-    
     private var unNotificationCenter: UNUserNotificationCenter!
     private var scene = GameScene()
-    
-    //MARK: - Objects
-    
     
     //MARK: LifeCycle
     override func viewDidLoad() {
@@ -27,13 +23,11 @@ class GameViewController: UIViewController {
         view.backgroundColor = .white
         askForNotificationPermission()
         setupGameScene()
-        
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
-    
     
     //MARK: - Functions
     func askForNotificationPermission() {
@@ -58,17 +52,6 @@ class GameViewController: UIViewController {
         scene.sceneDelegate = self
         scene.landNode.delegate = self
     }
-    
-    
-    
-//    private func hideSubViews() {
-//        logInBackground.isHidden = true
-//        emailTextField.isHidden = true
-//        passwordTextField.isHidden = true
-//        createAccountButton.isHidden = true
-//        logoLabel.isHidden = true
-//        loginButton.isHidden = true
-//    }
 
     func makePlantActionSheet() {
         let actionSheet = UIAlertController(title: "What to plant?", message: nil, preferredStyle: .actionSheet)
@@ -121,9 +104,7 @@ class GameViewController: UIViewController {
     private func postFoodType(foodAmount: Int, maxTimeAmount: Int) {
         NotificationCenter.default.post(name: Notification.Name(NotificationNames.foodType.rawValue), object: self, userInfo: ["foodAmount": foodAmount, "maxTimeAmount": maxTimeAmount])
     }
-    
 }
-
 
 extension GameViewController: NotificationDelegate {
     func makeNotification(title: String, message: String,timeInterval: Double) {
@@ -147,7 +128,6 @@ extension GameViewController: UNUserNotificationCenterDelegate {
         completionHandler([.alert,.sound])
     }
 }
-
 
 extension GameViewController: GameSceneDelegate {
     func buttonPressed(senderId: String) {
