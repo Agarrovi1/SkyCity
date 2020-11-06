@@ -126,7 +126,7 @@ class GameScene: SKScene {
     }
     
     //MARK: - SetUp
-    func setCloudBgTexture() {
+    private func setCloudBgTexture() {
         let bgTexture = SKTexture(imageNamed: "clouds")
         let bgDefinition = SKTileDefinition(texture: bgTexture, size: CGSize(width: 40, height: 40))
         let bgGroup = SKTileGroup(tileDefinition: bgDefinition)
@@ -137,17 +137,17 @@ class GameScene: SKScene {
         bgNode.fill(with: bgGroup)
         self.addChild(bgNode)
     }
-    func makeEditButton() {
+    private func makeEditButton() {
         editButton = SKSpriteNode(color: SKColor.red, size: CGSize(width: 100, height: 44))
         editButton.position = CGPoint(x:self.frame.maxX - 70, y:self.frame.maxY - 70)
         self.addChild(editButton)
     }
-    func makePlantButton() {
+    private func makePlantButton() {
         plantButton = SKSpriteNode(color: SKColor.green, size: CGSize(width: 100, height: 44))
         plantButton.position = CGPoint(x:self.frame.minX + 70, y:self.frame.minY + 70)
         self.addChild(plantButton)
     }
-    func makeFoodLabel() {
+    private func makeFoodLabel() {
         foodLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
         foodLabel.fontSize = 17
         foodLabel.position = CGPoint(x: self.frame.minX + 50, y: self.frame.maxY - 70)
@@ -157,7 +157,7 @@ class GameScene: SKScene {
         foodLabel.color = .black
         self.addChild(foodLabel)
     }
-    func makeStarBitsLabel() {
+    private func makeStarBitsLabel() {
         starBitsLabel = SKLabelNode(fontNamed: "AvenirNext-Bold")
         starBitsLabel.fontSize = 17
         starBitsLabel.position = CGPoint(x: foodLabel.position.x, y: foodLabel.position.y - 20)
@@ -167,13 +167,13 @@ class GameScene: SKScene {
         self.addChild(starBitsLabel)
     }
     
-    func makeBuildButton() {
+    private func makeBuildButton() {
         buildButton = SKSpriteNode(color: SKColor.systemBlue, size: CGSize(width: 100, height: 44))
         buildButton.position = CGPoint(x:self.frame.maxX - 70, y:self.frame.minY + 70)
         buildButton.isHidden = true
         self.addChild(buildButton)
     }
-    func setupGameUI(view: SKView) {
+    private func setupGameUI(view: SKView) {
         setCloudBgTexture()
         addChild(landNode)
         landNode.position = view.center
