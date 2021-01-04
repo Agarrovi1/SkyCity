@@ -5,7 +5,7 @@
 Researchers have found a planet that with hospitable atmosphere and are trying build a settlement for people there. Above the clouds is where the air is safe and below is dangerous. Your job if you so choose is to help build this city in the sky.
 
 
-[](https://github.com/Agarrovi1/SkyCity/blob/master/Images/SkyCity.gif)
+![](https://github.com/Agarrovi1/SkyCity/blob/master/Images/SkyCity.gif)
 
 **Prototype Features**
 
